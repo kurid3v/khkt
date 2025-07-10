@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+{% block title %}Kết quả bài nộp{% endblock %}
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .result-container {
+        max-width: 900px;
+        margin: 40px auto;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .result-container h2 {
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
+        color: white;
+        font-size: 28px;
+        margin: 0;
+        padding: 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .result-container h2::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .content-wrapper {
+        padding: 40px;
+    }
+
+    .info-row {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        margin-bottom: 20px;
+        padding: 20px;
+        border-radius: 15px;
+        border-left: 4px solid #FF6B35;
+        font-size: 16px;
+        line-height: 1.6;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .info-row:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .info-row::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .info-row:hover::before {
+        opacity: 1;
+    }
+
+    .info-row strong {
+        display: inline-block;
+        min-width: 160px;
+        color: #2c3e50;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-row:has(strong:contains("Điểm số")) {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border-left-color: #20c997;
+    }
+
+    .info-row:has(strong:contains("Điểm số")) strong {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .section-title {
+        font-weight: 700;
+        margin: 35px 0 20px;
+        color: #2c3e50;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title::before {
+        content: '🧠';
+        font-size: 20px;
+    }
+
+    .section-title:has-text("Nội dung bài làm")::before {
+        content: '📌';
+    }
+
+    .code-container {
+        background: #1e1e1e;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        margin: 20px 0;
+        position: relative;
+    }
+
+    .code-header {
+        background: #2d2d2d;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+        font-size: 0.9em;
+    }
+
+    .code-dots {
+        display: flex;
+        gap: 6px;
+    }
+
+    .code-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .code-dot:nth-child(1) { background: #ff5f56; }
+    .code-dot:nth-child(2) { background: #ffbd2e; }
+    .code-dot:nth-child(3) { background: #27ca3f; }
+
+    pre {
+        background: #1e1e1e;
+        color: #f8f8f2;
+        padding: 25px;
+        border-radius: 0;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        font-family: 'Fira Code', 'Consolas', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0;
+        position: relative;
+    }
+
+    .section-title + pre {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        color: #856404;
+        border-left: 4px solid #ffc107;
+        border-radius: 12px;
+        padding: 20px;
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 40px;
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
+        color: white;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    }
+
+    .back-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .back-link::before {
+        content: '←';
+        font-size: 16px;
+    }
+
+    .copy-btn {
+        position: absolute;
+        top: 12px;
+        right: 15px;
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: white;
+        padding: 8px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .copy-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    @media (max-width: 768px) {
+        .result-container {
+            margin: 20px auto;
+            max-width: 95%;
+        }
+        
+        .content-wrapper {
+            padding: 20px;
+        }
+        
+        .info-row strong {
+            min-width: 120px;
+            display: block;
+            margin-bottom: 5px;
+        }
+    }
+
+    /* Animation delays for staggered effect */
+    .info-row:nth-child(1) { animation-delay: 0.1s; }
+    .info-row:nth-child(2) { animation-delay: 0.2s; }
+    .info-row:nth-child(3) { animation-delay: 0.3s; }
+    .info-row:nth-child(4) { animation-delay: 0.4s; }
+    .info-row:nth-child(5) { animation-delay: 0.5s; }
+    
+    .info-row {
+        animation: slideUp 0.6s ease-out forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+</style>
+
+<div class="result-container">
+    <h2>📄 Kết quả bài nộp</h2>
+    
+    <div class="content-wrapper">
+        <div class="info-row">
+            <strong>👤 Người nộp:</strong> {{ submission.user.username }}
+        </div>
+        
+        <div class="info-row">
+            <strong>📝 Tên đề bài:</strong> {{ submission.problem.title }}
+        </div>
+        
+        <div class="info-row">
+            <strong>⏰ Thời gian nộp:</strong> {{ submission.submitted_at|date:"H:i d/m/Y" }}
+        </div>
+        
+        <div class="section-title">📌 Nội dung bài làm:</div>
+        <div class="code-container">
+            <div class="code-header">
+                <div class="code-dots">
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                </div>
+                <span>solution.py</span>
+            </div>
+            <pre>{{ submission.code }}</pre>
+            <button class="copy-btn" onclick="copyCode()">📋</button>
+        </div>
+        
+        {% if submission.result %}
+            <div class="info-row">
+                <strong>✅ Kết quả chấm (AI):</strong> {{ submission.result }}
+            </div>
+        {% endif %}
+        
+        {% if submission.score %}
+            <div class="info-row">
+                <strong>📊 Điểm số:</strong> {{ submission.score }}/10
+            </div>
+        {% endif %}
+        
+        {% if submission.comment %}
+            <div class="section-title">🧠 Nhận xét của AI:</div>
+            <pre>{{ submission.comment }}</pre>
+        {% endif %}
+        
+        <a href="{% url 'problem_detail' submission.problem.id %}" class="back-link">
+            Quay lại đề bài
+        </a>
+    </div>
+</div>
+
+<script>
+    function copyCode() {
+        const codeElement = document.querySelector('.code-container pre');
+        const code = codeElement.textContent;
+        
+        navigator.clipboard.writeText(code).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '✅';
+            btn.style.background = 'rgba(40, 167, 69, 0.8)';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = 'rgba(255,255,255,0.1)';
+            }, 2000);
+        }).catch(err => {
+            console.error('Không thể copy code:', err);
+        });
+    }
+</script>
+
+{% endblock %}

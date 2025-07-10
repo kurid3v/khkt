@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Nộp bài - {{ problem.title }}{% endblock %}
+
+{% block content %}
+<style>
+    .submit-container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 25px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        font-family: Arial, sans-serif;
+    }
+
+    .submit-container h2 {
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    .submit-container form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .submit-container form button {
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-top: 15px;
+        align-self: flex-start;
+    }
+
+    .submit-container form button:hover {
+        background-color: #2980b9;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        text-decoration: none;
+        color: #3498db;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .submit-container label {
+        font-weight: bold;
+    }
+
+    .submit-container textarea,
+    .submit-container input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-family: monospace;
+    }
+</style>
+
+<div class="submit-container">
+    <h2>Nộp bài cho đề: <em>{{ problem.title }}</em></h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">📤 Nộp bài</button>
+    </form>
+
+    <a class="back-link" href="{% url 'problem_detail' problem.id %}">← Quay lại đề</a>
+</div>
+{% endblock %}

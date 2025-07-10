@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kết quả bài làm</title>
+</head>
+<body>
+    <h1>Kết quả nộp bài cho: {{ problem.title }}</h1>
+
+    <h3>Đáp án bạn đã nộp:</h3>
+    <pre>{{ answer }}</pre>
+
+    <h3>Kết quả:</h3>
+    <p>{{ result }}</p>
+
+    <br>
+    <a href="{% url 'problem_list' %}">← Về danh sách đề</a>
+</body>
+</html>
+EOF

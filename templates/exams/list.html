@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}📄 Danh sách đề thi{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 30px auto;">
+    <h2>📄 Danh sách đề thi</h2>
+
+    <a href="{% url 'add_exam' %}" style="background: #3498db; color: white; padding: 10px 15px; border-radius: 6px; text-decoration: none;">
+        ➕ Thêm đề thi
+    </a>
+
+    <ul>
+        {% for exam in exams %}
+            <li style="margin: 10px 0;">
+                <strong>{{ exam.title }}</strong><br>
+                {{ exam.description|truncatewords:20 }}<br>
+                👤 Người tạo: {{ exam.created_by.username }} | 🕒 {{ exam.created_at|date:"H:i d/m/Y" }}
+            </li>
+        {% empty %}
+            <p>Chưa có đề thi nào.</p>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,235 @@
+{% comment %} <!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>📤 Nộp bài - {{ problem.title }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f5f7fa;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .meta {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .meta strong {
+            color: #333;
+        }
+
+        .content {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 240px;
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 25px;
+            font-size: 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📘 Làm bài: {{ problem.title }}</h1>
+
+        <div class="meta">
+            <p><strong>Môn:</strong> {{ problem.get_subject_display }}</p>
+            <p><strong>Loại:</strong> {{ problem.get_question_type_display }}</p>
+        </div>
+
+        <div class="content">
+            {{ problem.content|linebreaks }}
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <label for="answer"><strong>✏️ Nhập đáp án hoặc mã nguồn:</strong></label><br>
+            <textarea name="answer" id="answer" placeholder="Bài làm:"></textarea><br>
+            <button type="submit">🚀 Nộp bài</button>
+        </form>
+
+        <a href="{% url 'problem_list' %}" class="back-link">← Quay lại danh sách đề</a>
+    </div>
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>📤 Nộp bài - {{ problem.title }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f5f7fa;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .meta {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .meta strong {
+            color: #333;
+        }
+
+        .content {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 240px;
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        .radio-option {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 25px;
+            font-size: 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📘 Làm bài: {{ problem.title }}</h1>
+
+    <div class="meta">
+        <p><strong>Môn:</strong> {{ problem.get_subject_display }}</p>
+        <p><strong>Loại:</strong> {{ problem.get_question_type_display }}</p>
+    </div>
+
+    <div class="content">
+        {{ problem.description|linebreaks }}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if problem.question_type == "MCQ" %}
+            <p><strong>📝 Chọn đáp án đúng:</strong></p>
+            <div class="radio-option"><label><input type="radio" name="answer" value="A" required> A</label></div>
+            <div class="radio-option"><label><input type="radio" name="answer" value="B"> B</label></div>
+            <div class="radio-option"><label><input type="radio" name="answer" value="C"> C</label></div>
+            <div class="radio-option"><label><input type="radio" name="answer" value="D"> D</label></div>
+        {% else %}
+            <label for="answer"><strong>✏️ Nhập đáp án hoặc mã nguồn:</strong></label><br>
+            <textarea name="answer" id="answer" placeholder="Bài làm của bạn..."></textarea>
+        {% endif %}
+
+        <button type="submit">🚀 Nộp bài</button>
+    </form>
+
+    <a href="{% url 'problem_list' %}" class="back-link">← Quay lại danh sách đề</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Danh sách bài nộp{% endblock %}
+
+{% block content %}
+<style>
+    .submission-list {
+        max-width: 900px;
+        margin: 40px auto;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .submission-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .submission-item {
+        background: #fdfdfd;
+        border: 1px solid #e0e0e0;
+        border-left: 5px solid #3498db;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+        transition: transform 0.1s ease-in-out;
+    }
+
+    .submission-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .submission-item h3 {
+        margin: 0 0 10px;
+        color: #2c3e50;
+        font-size: 18px;
+    }
+
+    .submission-meta {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    .view-result-btn {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #3498db;
+        color: #fff;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+
+    .view-result-btn:hover {
+        background-color: #2980b9;
+    }
+</style>
+
+<div class="submission-list">
+    <div class="submission-header">
+        <h1>📄 Danh sách bài đã nộp</h1>
+        <p>Chỉ hiển thị bài bạn đã nộp hoặc đề bạn đã tạo</p>
+    </div>
+
+    {% for submission in submissions %}
+        <div class="submission-item">
+            <h3>📘 {{ submission.problem.title }}</h3>
+            <div class="submission-meta">
+                👤 <strong>{{ submission.user.username }}</strong> |
+                📚 {{ submission.problem.get_subject_display }} |
+                🕒 {{ submission.submitted_at|date:"H:i d/m/Y" }}
+            </div>
+            <a class="view-result-btn" href="{% url 'view_result' submission.id %}">📊 Xem kết quả</a>
+        </div>
+    {% empty %}
+        <p style="text-align: center; color: #888;">🚫 Chưa có bài nộp nào để hiển thị.</p>
+    {% endfor %}
+</div>
+{% endblock %}
