@@ -12,7 +12,7 @@ from .models import Exam
 from .draw_answers import draw_circles_on_form
 from PIL import Image, ImageDraw
 import os
-from .utils.answer_sheet import draw_answer_sheet
+#from .utils.answer_sheet import draw_answer_sheet
 #from .views import draw_answer_sheet as draw_circles_on_form
 
 def exam_list(request):
