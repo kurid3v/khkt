@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}➕ Thêm bài tập{% endblock %}
+
+{% block content %}
+<style>
+    .form-container { max-width: 700px; margin: 30px auto; background: #f9f9f9; padding: 25px 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-family: 'Segoe UI', sans-serif; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { font-weight: 600; margin-bottom: 6px; display: block; }
+    .form-group input[type="text"], .form-group textarea, .form-group select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 15px; }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .submit-btn { display: block; width: 100%; padding: 12px; background-color: #3498db; color: white; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .submit-btn:hover { background-color: #2980b9; }
+    .choice-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+</style>
+
+<div class="form-container">
+    <h2>📝 Thêm bài tập cho đề: <span style="color: #e74c3c;">{{ exam.title }}</span></h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="question_text">Câu hỏi</label>
+            {{ form.question_text }}
+        </div>
+
+        <div class="form-group">
+            <label for="problem_type">Loại bài tập</label>
+            {{ form.problem_type }}
+        </div>
+
+        <div id="mcq-section" style="display: none;">
+            <h5>💡 Nhập các lựa chọn trắc nghiệm</h5>
+            {% for label in "ABCD" %}
+            <div class="choice-group">
+                <label><strong>{{ label }}.</strong></label>
+                <input type="text" name="choice_{{ label }}" placeholder="Đáp án {{ label }}" class="form-control">
+                <label>
+                    <input type="checkbox" name="correct_{{ label }}"> Đáp án đúng
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="submit-btn">➕ Thêm bài</button>
+    </form>
+</div>
+
+<script>
+    // Hiện/ẩn phần nhập trắc nghiệm nếu được chọn
+    document.addEventListener("DOMContentLoaded", function () {
+        const typeField = document.querySelector("select[name='problem_type']");
+        const mcqSection = document.getElementById("mcq-section");
+
+        function toggleMcq() {
+            if (typeField.value === "multiple_choice") {
+                mcqSection.style.display = "block";
+            } else {
+                mcqSection.style.display = "none";
+            }
+        }
+
+        typeField.addEventListener("change", toggleMcq);
+        toggleMcq();  // gọi khi trang tải
+    });
+</script>
+{% endblock %}

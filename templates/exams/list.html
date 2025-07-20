@@ -1,24 +1,95 @@
 {% extends 'base.html' %}
-{% block title %}📄 Danh sách đề thi{% endblock %}
-
+{% block title %}Danh sách Đề Thi{% endblock %}
 {% block content %}
-<div style="max-width: 800px; margin: 30px auto;">
-    <h2>📄 Danh sách đề thi</h2>
-
-    <a href="{% url 'add_exam' %}" style="background: #3498db; color: white; padding: 10px 15px; border-radius: 6px; text-decoration: none;">
-        ➕ Thêm đề thi
-    </a>
-
-    <ul>
-        {% for exam in exams %}
-            <li style="margin: 10px 0;">
-                <strong>{{ exam.title }}</strong><br>
-                {{ exam.description|truncatewords:20 }}<br>
-                👤 Người tạo: {{ exam.created_by.username }} | 🕒 {{ exam.created_at|date:"H:i d/m/Y" }}
-            </li>
-        {% empty %}
-            <p>Chưa có đề thi nào.</p>
-        {% endfor %}
-    </ul>
+<style>
+    body {
+        background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px 0;
+    }
+    .exam-list-container {
+        max-width: 800px;
+        margin: 30px auto;
+        padding: 30px;
+        background: rgba(15, 52, 96, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(26, 26, 46, 0.5);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(233, 69, 96, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .exam-card {
+        position: relative;
+        background: rgba(22, 33, 62, 0.9);
+        border-left: 6px solid #E94560;
+        padding: 20px 25px;
+        margin-bottom: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(26, 26, 46, 0.3);
+        transition: all 0.3s ease;
+    }
+    .exam-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(233, 69, 96, 0.2);
+        border-left-color: #0F3460;
+    }
+    .exam-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+        text-decoration: none;
+    }
+    .exam-title:hover {
+        color: #E94560;
+    }
+    .exam-info {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 15px;
+        margin-top: 10px;
+    }
+    h2 {
+        text-align: center;
+        color: #ffffff;
+        margin-bottom: 35px;
+        font-size: 32px;
+        font-weight: 700;
+    }
+    .add-button {
+        display: inline-block;
+        margin-bottom: 25px;
+        padding: 15px 25px;
+        background: linear-gradient(135deg, #E94560, #16213E);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 25px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(233, 69, 96, 0.3);
+    }
+    .add-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(233, 69, 96, 0.4);
+    }
+</style>
+<div class="exam-list-container">
+    <a href="{% url 'add_exam' %}" class="add-button">➕ Thêm đề thi</a>
+    <h2>📚 Danh sách đề thi</h2>
+    {% for exam in exams %}
+    <div class="exam-card">
+        <a href="{% url 'exam_detail' exam.id %}" class="exam-title">📘 {{ exam.title }}</a>
+        <div class="exam-info">
+            📝 {{ exam.description|truncatewords:25 }}<br>
+            🕒 <strong>Thời gian:</strong> {{ exam.start_time|date:"H:i d/m/Y" }} - {{ exam.end_time|date:"H:i d/m/Y" }}<br>
+            👤 <strong>Người tạo:</strong> {{ exam.created_by.username }}
+        </div>
+    </div>
+    {% empty %}
+    <div class="exam-card">
+        <p style="color: white; text-align: center;">Chưa có đề thi nào.</p>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

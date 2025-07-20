@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+
+{% block title %}Chi tiết đề thi{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+    <div class="mb-4">
+        <h2>📘 {{ exam.title }}</h2>
+        <p><strong>Mô tả:</strong> {{ exam.description }}</p>
+        <p><strong>⏰ Bắt đầu:</strong> {{ exam.start_time|date:"H:i d/m/Y" }}</p>
+        <p><strong>⏳ Kết thúc:</strong> {{ exam.end_time|date:"H:i d/m/Y" }}</p>
+
+        {% if request.user == exam.created_by %}
+            <a href="{% url 'add_exam_problem' exam.id %}" class="btn btn-success btn-sm mt-2">
+                ➕ Thêm bài tập
+            </a>
+        {% endif %}
+    </div>
+
+    <hr>
+    <h4>📚 Danh sách bài tập</h4>
+
+    {% for problem in exam.exam_problems.all %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">{{ forloop.counter }}. {{ problem.question_text }}</h5>
+
+                {% if problem.problem_type == 'multiple_choice' %}
+                    <form method="post" action="{% url 'submit_mcq' problem.id %}">
+                        {% csrf_token %}
+
+                        {% for choice in problem.choices.all %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="answer" id="choice{{ choice.id }}" value="{{ choice.id }}">
+                                <label class="form-check-label" for="choice{{ choice.id }}">
+                                    <strong>{{ letters|index:forloop.counter0 }}</strong>. {{ choice.text }}
+                                </label>
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-primary mt-3">📤 Nộp bài</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'problem_detail' problem.id %}" class="btn btn-outline-primary mt-2">✍️ Làm bài tự luận</a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">Chưa có bài tập nào trong đề thi này.</p>
+    {% endfor %}
+
+    {% if answer_image %}
+        <hr>
+        <h4>🖼 Phiếu tô đáp án:</h4>
+        <img src="{{ answer_image }}" class="img-fluid mb-3" style="max-width: 100%; border: 1px solid #ccc;">
+        <a href="{{ answer_image }}" class="btn btn-success" download>Tải ảnh đã tô</a>
+    {% endif %}
+
+</div>
+{% endblock %}

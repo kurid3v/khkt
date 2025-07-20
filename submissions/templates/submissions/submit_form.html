@@ -1,122 +1,23 @@
-{% comment %} <!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>📤 Nộp bài - {{ problem.title }}</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f5f7fa;
-            padding: 40px 20px;
-            margin: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-        }
-
-        h1 {
-            color: #2c3e50;
-            font-size: 26px;
-            margin-bottom: 10px;
-        }
-
-        .meta {
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .meta strong {
-            color: #333;
-        }
-
-        .content {
-            background: #f1f1f1;
-            padding: 15px;
-            border-radius: 6px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            margin-bottom: 25px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 240px;
-            padding: 12px;
-            font-size: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-family: monospace;
-            resize: vertical;
-        }
-
-        button {
-            margin-top: 15px;
-            padding: 10px 25px;
-            font-size: 16px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 25px;
-            text-decoration: none;
-            color: #3498db;
-            font-weight: bold;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>📘 Làm bài: {{ problem.title }}</h1>
-
-        <div class="meta">
-            <p><strong>Môn:</strong> {{ problem.get_subject_display }}</p>
-            <p><strong>Loại:</strong> {{ problem.get_question_type_display }}</p>
-        </div>
-
-        <div class="content">
-            {{ problem.content|linebreaks }}
-        </div>
-
-        <form method="post">
-            {% csrf_token %}
-            <label for="answer"><strong>✏️ Nhập đáp án hoặc mã nguồn:</strong></label><br>
-            <textarea name="answer" id="answer" placeholder="Bài làm:"></textarea><br>
-            <button type="submit">🚀 Nộp bài</button>
-        </form>
-
-        <a href="{% url 'problem_list' %}" class="back-link">← Quay lại danh sách đề</a>
-    </div>
-</body>
-</html> {% endcomment %}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <title>📤 Nộp bài - {{ problem.title }}</title>
     <style>
+        :root {
+            --deep-blue: #1A1A2E;
+            --dark-blue: #16213E;
+            --navy-blue: #0F3460;
+            --accent-red: #E94560;
+            --light-bg: #1A1A2E;
+            --white: #16213E;
+            --text-dark: #E1E8FF;
+            --text-light: #A8B5CD;
+        }
+
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f5f7fa;
+            background-color: var(--light-bg);
             padding: 40px 20px;
             margin: 0;
         }
@@ -124,34 +25,38 @@
         .container {
             max-width: 800px;
             margin: auto;
-            background-color: #ffffff;
+            background-color: var(--dark-blue);
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--navy-blue);
         }
 
         h1 {
-            color: #2c3e50;
+            color: var(--text-dark);
             font-size: 26px;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         .meta {
-            color: #666;
+            color: var(--text-light);
             margin-bottom: 20px;
         }
 
         .meta strong {
-            color: #333;
+            color: var(--text-dark);
         }
 
         .content {
-            background: #f1f1f1;
+            background: var(--navy-blue);
+            color: var(--text-dark);
             padding: 15px;
             border-radius: 6px;
             font-family: monospace;
             white-space: pre-wrap;
             margin-bottom: 25px;
+            border: 1px solid var(--deep-blue);
         }
 
         textarea {
@@ -159,23 +64,42 @@
             height: 240px;
             padding: 12px;
             font-size: 15px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--navy-blue);
             border-radius: 6px;
             font-family: monospace;
             resize: vertical;
+            transition: border-color 0.2s;
+            background-color: var(--deep-blue);
+            color: var(--text-dark);
+        }
+
+        textarea:focus {
+            border-color: var(--accent-red);
+            outline: none;
         }
 
         .radio-option {
             margin-bottom: 10px;
             font-size: 16px;
+            color: var(--text-light);
+        }
+        
+        .radio-option label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .radio-option input {
+            accent-color: var(--accent-red);
         }
 
         button {
             margin-top: 15px;
             padding: 10px 25px;
             font-size: 16px;
-            background-color: #3498db;
-            color: white;
+            background-color: var(--accent-red);
+            color: var(--white);
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -183,15 +107,16 @@
         }
 
         button:hover {
-            background-color: #2980b9;
+            background-color: #d83d4a; /* Màu đỏ đậm hơn khi hover */
         }
 
         .back-link {
             display: inline-block;
             margin-top: 25px;
             text-decoration: none;
-            color: #3498db;
+            color: var(--accent-red);
             font-weight: bold;
+            text-align: center;
         }
 
         .back-link:hover {

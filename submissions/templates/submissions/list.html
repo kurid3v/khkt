@@ -554,9 +554,10 @@
                 </div>
                 
                 <div class="submission-actions">
-                    <a class="view-result-btn" href="{% url 'view_result' submission.id %}">
-                        📊 Xem kết quả chi tiết
-                    </a>
+                    {% if submission.user == request.user or submission.problem.author == request.user %}
+                     <a class="view-result-btn" href="{% url 'view_result' submission.id %}">📊 Xem kết quả</a>
+{% endif %}
+
                     {% if submission.can_retry %}
                     <a class="secondary-btn" href="{% url 'retry_problem' submission.problem.id %}">
                         🔄 Làm lại

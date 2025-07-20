@@ -20,9 +20,18 @@ QUESTION_TYPE = [
 ]
 
 DIFFICULTY_LEVELS = [
-    ('easy', 'Dễ'),
-    ('medium', 'Trung bình'),
-    ('hard', 'Khó'),
+    ('one', '1'),   # Thêm dấu phẩy ở đây
+    ('two', '2'),   # Thêm dấu phẩy ở đây
+    ('three', '3'), # Thêm dấu phẩy ở đây
+    ('four', '4'),  # Thêm dấu phẩy ở đây
+    ('five', '5'),  # Thêm dấu phẩy ở đây
+    ('six', '6'),   # Thêm dấu phẩy ở đây
+    ('seven', '7'), # Thêm dấu phẩy ở đây
+    ('eight', '8'), # Thêm dấu phẩy ở đây
+    ('nine', '9'),  # Thêm dấu phẩy ở đây
+    ('ten', '10'),  # Thêm dấu phẩy ở đây
+    ('eleven', '11'), # Thêm dấu phẩy ở đây
+    ('twelve', '12')  # Thêm dấu phẩy ở đây
 ]
 
 # class Problem(models.Model):
