@@ -20,31 +20,19 @@ QUESTION_TYPE = [
 ]
 
 DIFFICULTY_LEVELS = [
-    ('one', '1'),   # Thêm dấu phẩy ở đây
-    ('two', '2'),   # Thêm dấu phẩy ở đây
-    ('three', '3'), # Thêm dấu phẩy ở đây
-    ('four', '4'),  # Thêm dấu phẩy ở đây
-    ('five', '5'),  # Thêm dấu phẩy ở đây
-    ('six', '6'),   # Thêm dấu phẩy ở đây
-    ('seven', '7'), # Thêm dấu phẩy ở đây
-    ('eight', '8'), # Thêm dấu phẩy ở đây
-    ('nine', '9'),  # Thêm dấu phẩy ở đây
-    ('ten', '10'),  # Thêm dấu phẩy ở đây
-    ('eleven', '11'), # Thêm dấu phẩy ở đây
-    ('twelve', '12')  # Thêm dấu phẩy ở đây
+    ('one', '1'),
+    ('two', '2'),
+    ('three', '3'),
+    ('four', '4'),
+    ('five', '5'),
+    ('six', '6'),
+    ('seven', '7'),
+    ('eight', '8'),
+    ('nine', '9'),
+    ('ten', '10'),
+    ('eleven', '11'),
+    ('twelve', '12'),
 ]
-
-# class Problem(models.Model):
-#     title = models.CharField(max_length=200)
-#     description = models.TextField()
-#     subject = models.CharField(max_length=10, choices=SUBJECT_CHOICES)
-#     question_type = models.CharField(max_length=10, choices=QUESTION_TYPE, default='WRIT')
-#     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_LEVELS)
-#     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-#     grading_criteria = models.TextField(null=True, blank=True, help_text="Tiêu chí chấm bài (dành cho AI)")
-#     created_at = models.DateTimeField(default=timezone.now)
-#     def __str__(self):
-#         return self.title
 
 class Problem(models.Model):
     title = models.CharField(max_length=200)
@@ -55,8 +43,9 @@ class Problem(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     grading_criteria = models.TextField(null=True, blank=True, help_text="Tiêu chí chấm bài (dành cho AI)")
     created_at = models.DateTimeField(default=timezone.now)
+    # Thêm trường mới để ẩn/hiện bài tập
+    is_hidden = models.BooleanField(default=False)
 
-    # Các lựa chọn trắc nghiệm (chỉ dùng nếu question_type == 'MCQ')
     choice_a = models.CharField(max_length=255, null=True, blank=True)
     choice_b = models.CharField(max_length=255, null=True, blank=True)
     choice_c = models.CharField(max_length=255, null=True, blank=True)

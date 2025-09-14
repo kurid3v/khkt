@@ -1,160 +1,150 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>📤 Nộp bài - {{ problem.title }}</title>
-    <style>
-        :root {
-            --deep-blue: #1A1A2E;
-            --dark-blue: #16213E;
-            --navy-blue: #0F3460;
-            --accent-red: #E94560;
-            --light-bg: #1A1A2E;
-            --white: #16213E;
-            --text-dark: #E1E8FF;
-            --text-light: #A8B5CD;
-        }
+{% extends 'base.html' %}
+{% block title %}� Làm bài - {{ problem.title }}{% endblock %}
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--light-bg);
-            padding: 40px 20px;
-            margin: 0;
-        }
+{% block content %}
+<div class="container max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center justify-center gap-3">
+                <i class="fas fa-pencil-alt text-indigo-200"></i>
+                <span class="bg-gradient-to-r from-indigo-200 to-purple-200 text-transparent bg-clip-text">
+                    {{ problem.title }}
+                </span>
+            </h1>
+        </div>
 
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background-color: var(--dark-blue);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--navy-blue);
-        }
+        <!-- Meta Info -->
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <div class="flex flex-wrap justify-center gap-6">
+                <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                    <span class="text-indigo-500"><i class="fas fa-book text-lg"></i></span>
+                    <span class="text-gray-600">Môn học:</span>
+                    <span class="font-semibold text-indigo-700">{{ problem.get_subject_display }}</span>
+                </div>
+                <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                    <span class="text-indigo-500"><i class="fas fa-tasks text-lg"></i></span>
+                    <span class="text-gray-600">Loại:</span>
+                    <span class="font-semibold text-indigo-700">{{ problem.get_question_type_display }}</span>
+                </div>
+            </div>
+        </div>
 
-        h1 {
-            color: var(--text-dark);
-            font-size: 26px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
+        <!-- Problem Description -->
+        <div class="px-6 py-6">
+            <div class="relative group">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl blur-sm"></div>
+                <div class="relative bg-gray-900 text-gray-100 rounded-xl p-6 font-mono text-sm md:text-base leading-relaxed shadow-lg mb-8">
+                    <div class="max-h-[400px] overflow-y-auto problem-content pr-2">
+                        {{ problem.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
 
-        .meta {
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
+            <!-- Answer Form -->
+            <form method="post" class="space-y-8" novalidate>
+                {% csrf_token %}
 
-        .meta strong {
-            color: var(--text-dark);
-        }
+                {% if problem.question_type == "MCQ" %}
+                    <div class="space-y-6">
+                        <label class="block text-lg font-semibold text-gray-700">
+                            <i class="fas fa-check-circle mr-2 text-indigo-500"></i>Chọn đáp án đúng:
+                        </label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" role="radiogroup">
+                            {% for choice in "ABCD" %}
+                            <label class="relative flex items-center justify-center p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-all duration-300 group">
+                                <input type="radio" name="answer" value="{{ choice }}" 
+                                       class="absolute inset-0 opacity-0 cursor-pointer"
+                                       {% if forloop.first %}required{% endif %}>
+                                <span class="text-xl font-bold text-gray-700 group-hover:scale-110 transition-transform duration-300">{{ choice }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="space-y-4">
+                        <label for="answer" class="block text-lg font-semibold text-gray-700">
+                            <i class="fas fa-pencil-alt mr-2 text-indigo-500"></i>Nhập câu trả lời:
+                        </label>
+                        <div class="relative group">
+                            <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                            <textarea
+                                name="answer"
+                                id="answer"
+                                rows="8"
+                                class="relative w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-indigo-400 focus:ring focus:ring-indigo-200 transition-all duration-300 font-mono bg-white/80 backdrop-blur-sm resize-none"
+                                placeholder="Nhập câu trả lời của bạn ở đây..."
+                            ></textarea>
+                        </div>
+                    </div>
+                {% endif %}
 
-        .content {
-            background: var(--navy-blue);
-            color: var(--text-dark);
-            padding: 15px;
-            border-radius: 6px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            margin-bottom: 25px;
-            border: 1px solid var(--deep-blue);
-        }
-
-        textarea {
-            width: 100%;
-            height: 240px;
-            padding: 12px;
-            font-size: 15px;
-            border: 1px solid var(--navy-blue);
-            border-radius: 6px;
-            font-family: monospace;
-            resize: vertical;
-            transition: border-color 0.2s;
-            background-color: var(--deep-blue);
-            color: var(--text-dark);
-        }
-
-        textarea:focus {
-            border-color: var(--accent-red);
-            outline: none;
-        }
-
-        .radio-option {
-            margin-bottom: 10px;
-            font-size: 16px;
-            color: var(--text-light);
-        }
-        
-        .radio-option label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .radio-option input {
-            accent-color: var(--accent-red);
-        }
-
-        button {
-            margin-top: 15px;
-            padding: 10px 25px;
-            font-size: 16px;
-            background-color: var(--accent-red);
-            color: var(--white);
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        button:hover {
-            background-color: #d83d4a; /* Màu đỏ đậm hơn khi hover */
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 25px;
-            text-decoration: none;
-            color: var(--accent-red);
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>📘 Làm bài: {{ problem.title }}</h1>
-
-    <div class="meta">
-        <p><strong>Môn:</strong> {{ problem.get_subject_display }}</p>
-        <p><strong>Loại:</strong> {{ problem.get_question_type_display }}</p>
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row justify-center gap-4 pt-6">
+                    <a href="{% url 'problem_list' %}" 
+                       class="inline-flex items-center justify-center px-6 py-3 border-2 border-gray-200 rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Quay lại
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center justify-center px-8 py-3 rounded-xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/25">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Nộp bài
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="content">
-        {{ problem.description|linebreaks }}
-    </div>
-
-    <form method="post">
-        {% csrf_token %}
-
-        {% if problem.question_type == "MCQ" %}
-            <p><strong>📝 Chọn đáp án đúng:</strong></p>
-            <div class="radio-option"><label><input type="radio" name="answer" value="A" required> A</label></div>
-            <div class="radio-option"><label><input type="radio" name="answer" value="B"> B</label></div>
-            <div class="radio-option"><label><input type="radio" name="answer" value="C"> C</label></div>
-            <div class="radio-option"><label><input type="radio" name="answer" value="D"> D</label></div>
-        {% else %}
-            <label for="answer"><strong>✏️ Nhập đáp án hoặc mã nguồn:</strong></label><br>
-            <textarea name="answer" id="answer" placeholder="Bài làm của bạn..."></textarea>
-        {% endif %}
-
-        <button type="submit">🚀 Nộp bài</button>
-    </form>
-
-    <a href="{% url 'problem_list' %}" class="back-link">← Quay lại danh sách đề</a>
 </div>
-</body>
-</html>
+
+<style>
+    /* Custom radio button styling for MCQ */
+    input[type="radio"]:checked + span {
+        @apply text-white;
+    }
+    
+    input[type="radio"]:checked + span::before {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl -z-10;
+    }
+
+    input[type="radio"]:checked + span::after {
+        content: '✓';
+        @apply absolute top-1 right-2 text-indigo-200 text-sm;
+    }
+
+    /* Problem content scrollbar styling */
+    .problem-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .problem-content::-webkit-scrollbar-track {
+        @apply bg-gray-800 rounded-full;
+    }
+
+    .problem-content::-webkit-scrollbar-thumb {
+        @apply bg-indigo-500/50 rounded-full;
+    }
+
+    .problem-content::-webkit-scrollbar-thumb:hover {
+        @apply bg-indigo-400;
+    }
+
+    /* Textarea scrollbar styling */
+    textarea::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    textarea::-webkit-scrollbar-track {
+        @apply bg-gray-100 rounded-full;
+    }
+
+    textarea::-webkit-scrollbar-thumb {
+        @apply bg-indigo-400 rounded-full;
+    }
+
+    textarea::-webkit-scrollbar-thumb:hover {
+        @apply bg-indigo-500;
+    }
+</style>
+{% endblock %}

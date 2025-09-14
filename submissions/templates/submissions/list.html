@@ -1,644 +1,269 @@
 {% extends 'base.html' %}
 {% block title %}Danh sách bài nộp{% endblock %}
 {% block content %}
-<style>
-    body {
-        background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
-        min-height: 100vh;
-        margin: 0;
-        padding: 0;
-        position: relative;
-        overflow-x: hidden;
-    }
-    
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle at 20% 80%, rgba(233, 69, 96, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 20%, rgba(15, 52, 96, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 40% 40%, rgba(22, 33, 62, 0.1) 0%, transparent 50%);
-        pointer-events: none;
-        z-index: -1;
-    }
-    
-    .submission-list {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 40px 20px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    .submission-header {
-        text-align: center;
-        margin-bottom: 50px;
-        position: relative;
-    }
-    
-    .submission-header h1 {
-        color: #ffffff;
-        font-size: 3.5em;
-        font-weight: 700;
-        margin: 0;
-        background: linear-gradient(135deg, #ffffff 0%, #E94560 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: none;
-        position: relative;
-    }
-    
-    .submission-header::after {
-        content: '';
-        position: absolute;
-        bottom: -20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100px;
-        height: 4px;
-        background: linear-gradient(90deg, #E94560, #0F3460);
-        border-radius: 2px;
-        animation: glow 2s ease-in-out infinite alternate;
-    }
-    
-    @keyframes glow {
-        from { box-shadow: 0 0 5px #E94560, 0 0 10px #E94560; }
-        to { box-shadow: 0 0 10px #E94560, 0 0 20px #E94560; }
-    }
-    
-    .filters-container {
-        background: rgba(15, 52, 96, 0.2);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(233, 69, 96, 0.2);
-        border-radius: 20px;
-        padding: 25px;
-        margin-bottom: 40px;
-        box-shadow: 0 8px 32px rgba(26, 26, 46, 0.3);
-    }
-    
-    .filters {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        align-items: center;
-    }
-    
-    .filter-item {
-        position: relative;
-    }
-    
-    .filter-item label {
-        display: block;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .filter-item select, .filter-item input {
-        width: 100%;
-        padding: 15px 20px;
-        border: 2px solid rgba(233, 69, 96, 0.3);
-        border-radius: 15px;
-        font-size: 16px;
-        background: rgba(22, 33, 62, 0.8);
-        color: white;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 15px rgba(26, 26, 46, 0.2);
-    }
-    
-    .filter-item select:focus, .filter-item input:focus {
-        outline: none;
-        border-color: #E94560;
-        box-shadow: 0 0 0 4px rgba(233, 69, 96, 0.2), 0 8px 25px rgba(233, 69, 96, 0.3);
-        transform: translateY(-2px);
-    }
-    
-    .filter-item input::placeholder {
-        color: rgba(255, 255, 255, 0.5);
-    }
-    
-    .submissions-grid {
-        display: grid;
-        gap: 25px;
-        margin-bottom: 40px;
-    }
-    
-    .submission-item {
-        background: rgba(15, 52, 96, 0.4);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(233, 69, 96, 0.2);
-        border-radius: 20px;
-        padding: 30px;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 8px 32px rgba(26, 26, 46, 0.3);
-    }
-    
-    .submission-item::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0F3460, #E94560);
-        transition: all 0.3s ease;
-    }
-    
-    .submission-item:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 60px rgba(233, 69, 96, 0.3);
-        border-color: rgba(233, 69, 96, 0.5);
-    }
-    
-    .submission-item:hover::before {
-        background: linear-gradient(90deg, #E94560, #0F3460);
-        height: 6px;
-    }
-    
-    .submission-item.status-correct::before {
-        background: linear-gradient(90deg, #27ae60, #2ecc71);
-    }
-    .submission-item.status-incorrect::before {
-        background: linear-gradient(90deg, #E94560, #c0392b);
-    }
-    .submission-item.status-partial::before {
-        background: linear-gradient(90deg, #f39c12, #e67e22);
-    }
-    
-    .submission-header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 20px;
-        gap: 20px;
-    }
-    
-    .submission-item h3 {
-        margin: 0;
-        color: #ffffff;
-        font-size: 22px;
-        font-weight: 700;
-        flex: 1;
-        line-height: 1.3;
-    }
-    
-    .submission-score {
-        background: rgba(26, 26, 46, 0.8);
-        padding: 8px 16px;
-        border-radius: 25px;
-        font-size: 14px;
-        font-weight: 700;
-        color: #ffffff;
-        border: 2px solid rgba(233, 69, 96, 0.3);
-        backdrop-filter: blur(10px);
-        min-width: 80px;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .submission-score::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    .submission-score:hover::before {
-        left: 100%;
-    }
-    
-    .submission-score.high { 
-        background: rgba(39, 174, 96, 0.2); 
-        color: #2ecc71; 
-        border-color: #27ae60;
-        box-shadow: 0 0 20px rgba(39, 174, 96, 0.3);
-    }
-    .submission-score.medium { 
-        background: rgba(243, 156, 18, 0.2); 
-        color: #f39c12; 
-        border-color: #e67e22;
-        box-shadow: 0 0 20px rgba(243, 156, 18, 0.3);
-    }
-    .submission-score.low { 
-        background: rgba(233, 69, 96, 0.2); 
-        color: #E94560; 
-        border-color: #c0392b;
-        box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
-    }
-    
-    .submission-meta {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        margin-bottom: 25px;
-        padding: 20px;
-        background: rgba(26, 26, 46, 0.3);
-        border-radius: 15px;
-        border: 1px solid rgba(233, 69, 96, 0.1);
-    }
-    
-    .meta-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 14px;
-    }
-    
-    .meta-item span {
-        font-size: 18px;
-        width: 24px;
-        text-align: center;
-    }
-    
-    .meta-item strong {
-        color: #E94560;
-        font-weight: 600;
-    }
-    
-    .submission-actions {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .view-result-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 24px;
-        background: linear-gradient(135deg, #E94560, #c0392b);
-        color: #fff;
-        border-radius: 25px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 600;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .view-result-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    .view-result-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(233, 69, 96, 0.5);
-        background: linear-gradient(135deg, #c0392b, #E94560);
-    }
-    
-    .view-result-btn:hover::before {
-        left: 100%;
-    }
-    
-    .secondary-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 24px;
-        background: linear-gradient(135deg, #0F3460, #16213E);
-        color: #fff;
-        border-radius: 25px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 600;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 15px rgba(15, 52, 96, 0.4);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .secondary-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    .secondary-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(15, 52, 96, 0.5);
-        background: linear-gradient(135deg, #16213E, #0F3460);
-    }
-    
-    .secondary-btn:hover::before {
-        left: 100%;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 80px 40px;
-        color: rgba(255, 255, 255, 0.8);
-        background: rgba(15, 52, 96, 0.3);
-        backdrop-filter: blur(20px);
-        border-radius: 25px;
-        border: 2px dashed rgba(233, 69, 96, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .empty-state::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-    }
-    
-    @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .empty-state .icon {
-        font-size: 5em;
-        margin-bottom: 30px;
-        animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-    }
-    
-    .empty-state h3 {
-        color: #ffffff;
-        margin-bottom: 15px;
-        font-size: 24px;
-        font-weight: 600;
-    }
-    
-    .empty-state p {
-        font-size: 16px;
-        margin-bottom: 30px;
-        opacity: 0.9;
-    }
-    
-    .stats-summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 25px;
-        margin-bottom: 40px;
-    }
-    
-    .stat-card {
-        background: rgba(15, 52, 96, 0.4);
-        backdrop-filter: blur(20px);
-        padding: 30px;
-        border-radius: 20px;
-        text-align: center;
-        border: 1px solid rgba(233, 69, 96, 0.3);
-        box-shadow: 0 8px 32px rgba(26, 26, 46, 0.3);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #E94560, #0F3460);
-        transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(233, 69, 96, 0.4);
-        border-color: rgba(233, 69, 96, 0.5);
-    }
-    
-    .stat-card:hover::before {
-        height: 6px;
-    }
-    
-    .stat-number {
-        font-size: 3em;
-        font-weight: 800;
-        color: #E94560;
-        margin-bottom: 10px;
-        background: linear-gradient(135deg, #E94560, #ffffff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    .stat-label {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 16px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .submission-list {
-            padding: 20px 15px;
-        }
-        
-        .submission-header h1 {
-            font-size: 2.5em;
-        }
-        
-        .filters {
-            grid-template-columns: 1fr;
-        }
-        
-        .submission-header-row {
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .submission-meta {
-            grid-template-columns: 1fr;
-        }
-        
-        .submission-actions {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .view-result-btn, .secondary-btn {
-            justify-content: center;
-        }
-        
-        .stats-summary {
-            grid-template-columns: 1fr;
-        }
-    }
-    
-    /* Smooth transitions for all interactive elements */
-    * {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-</style>
-
-<div class="submission-list">
-    <div class="submission-header">
-        <h1>📄 Danh sách bài đã nộp</h1>
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <header class="relative mb-12">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-white rounded-xl shadow-md p-6 mb-8">
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <div class="w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-xl transform -rotate-6 hover:rotate-0 transition-transform">
+            <i class="fas fa-file-circle-check"></i>
+          </div>
+          <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg blur opacity-30"></div>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">Danh sách bài đã nộp</h1>
+          <p class="text-gray-500 text-sm mt-1">Xem và quản lý các bài tập đã nộp của bạn</p>
+        </div>
+      </div>
+      <div class="mt-4 md:mt-0 flex items-center space-x-2">
+        <a href="{% url 'problem_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors border-2 border-gray-200">
+          <i class="fas fa-list-ul mr-2 text-gray-500"></i>
+          Danh sách bài tập
+        </a>
+        <button class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors" title="Lọc bài nộp">
+          <i class="fas fa-filter"></i>
+        </button>
+      </div>
     </div>
-    
-    <div class="submissions-grid">
-        {% for submission in submissions %}
-            <div class="submission-item {% if submission.score >= 80 %}status-correct{% elif submission.score >= 50 %}status-partial{% else %}status-incorrect{% endif %}">
-                <div class="submission-header-row">
-                    <h3>📘 {{ submission.problem.title }}</h3>
-                    {% if submission.score is not None %}
-                    <div class="submission-score {% if submission.score >= 80 %}high{% elif submission.score >= 50 %}medium{% else %}low{% endif %}">
-                        {{ submission.score }}/10
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div class="submission-meta">
-                    <div class="meta-item">
-                        <span>👤</span>
-                        <div>
-                            Người nộp: <strong>{{ submission.user.username }}</strong>
-                        </div>
-                    </div>
-                    <div class="meta-item">
-                        <span>📚</span>
-                        <div>
-                            Môn học: <strong>{{ submission.problem.get_subject_display }}</strong>
-                        </div>
-                    </div>
-                    <div class="meta-item">
-                        <span>🕒</span>
-                        <div>
-                            Thời gian: <strong>{{ submission.submitted_at|date:"H:i d/m/Y" }}</strong>
-                        </div>
-                    </div>
-                    {% if submission.attempt_count %}
-                    <div class="meta-item">
-                        <span>🔄</span>
-                        <div>
-                            Lần thử: <strong>{{ submission.attempt_count }}</strong>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div class="submission-actions">
-                    {% if submission.user == request.user or submission.problem.author == request.user %}
-                     <a class="view-result-btn" href="{% url 'view_result' submission.id %}">📊 Xem kết quả</a>
-{% endif %}
+  </header>
 
-                    {% if submission.can_retry %}
-                    <a class="secondary-btn" href="{% url 'retry_problem' submission.problem.id %}">
-                        🔄 Làm lại
-                    </a>
-                    {% endif %}
-                </div>
+  {% if submissions %}
+  <ul class="space-y-8">
+    {% for submission in submissions %}
+    <li class="bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 group">
+      <div class="relative p-6">
+        <!-- Header with Title and Score -->
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+          <div class="flex-grow">
+            <h2 class="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors truncate flex items-center" title="{{ submission.problem.title }}">
+              <span class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center mr-3">
+                <i class="fas fa-book text-indigo-500"></i>
+              </span>
+              {{ submission.problem.title }}
+            </h2>
+          </div>
+          {% if submission.score is not None %}
+          <div class="flex items-center">
+            <div class="px-4 py-2 rounded-lg {% if submission.score >= 8 %}bg-emerald-50 text-emerald-700{% elif submission.score >= 5 %}bg-amber-50 text-amber-700{% else %}bg-red-50 text-red-700{% endif %} flex items-center space-x-2">
+              <div>
+                <div class="text-xs font-medium uppercase">Điểm số</div>
+                <div class="text-lg font-bold">{{ submission.score }}/10</div>
+              </div>
             </div>
-        {% empty %}
-            <div class="empty-state">
-                <div class="icon">📋</div>
-                <h3>Chưa có bài nộp nào</h3>
-                <p>Hãy bắt đầu làm bài để xem kết quả tại đây!</p>
-                <a href="{% url 'problem_list' %}" class="view-result-btn">
-                    🎯 Bắt đầu làm bài
-                </a>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Info Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-indigo-50/50 transition-colors">
+            <span class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center mr-3">
+              <i class="fas fa-user text-indigo-600"></i>
+            </span>
+            <div>
+              <div class="text-xs text-gray-500">Người nộp</div>
+              <div class="font-semibold text-gray-900 truncate">{{ submission.user.username }}</div>
             </div>
-        {% endfor %}
+          </div>
+          <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-purple-50/50 transition-colors">
+            <span class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mr-3">
+              <i class="fas fa-graduation-cap text-purple-600"></i>
+            </span>
+            <div>
+              <div class="text-xs text-gray-500">Môn học</div>
+              <div class="font-semibold text-gray-900 truncate">{{ submission.problem.get_subject_display }}</div>
+            </div>
+          </div>
+          <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-indigo-50/50 transition-colors">
+            <span class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center mr-3">
+              <i class="fas fa-clock text-indigo-600"></i>
+            </span>
+            <div>
+              <div class="text-xs text-gray-500">Thời gian</div>
+              <div class="font-semibold text-gray-900">{{ submission.submitted_at|date:"H:i d/m/Y" }}</div>
+            </div>
+          </div>
+          {% if submission.attempt_count %}
+          <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-purple-50/50 transition-colors">
+            <span class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mr-3">
+              <i class="fas fa-redo-alt text-purple-600"></i>
+            </span>
+            <div>
+              <div class="text-xs text-gray-500">Lần thử</div>
+              <div class="font-semibold text-gray-900">#{{ submission.attempt_count }}</div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-6 pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between">
+          <div class="flex items-center text-sm text-gray-500">
+            <i class="fas fa-info-circle mr-2"></i>
+            Nhấn "Xem kết quả" để xem chi tiết bài làm
+          </div>
+          <div class="flex flex-wrap gap-3">
+            {% if submission.user == request.user or submission.problem.author == request.user %}
+            <a href="{% url 'view_result' submission.id %}"
+               class="inline-flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 shadow-sm hover:shadow-md">
+              <i class="fas fa-chart-bar mr-2"></i>
+              Xem kết quả
+            </a>
+            {% endif %}
+            {% if request.user == submission.problem.author %}
+            <button onclick="showScoreModal('{{ submission.id }}', '{{ submission.problem.title }}')"
+                    class="inline-flex items-center px-4 py-2 rounded-lg border-2 border-gray-200 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300">
+              <i class="fas fa-edit mr-2"></i>
+              Sửa điểm
+            </button>
+            {% endif %}
+            {% if submission.can_retry %}
+            <a href="{% url 'retry_problem' submission.problem.id %}"
+               class="inline-flex items-center px-4 py-2 rounded-lg border-2 border-gray-200 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-300">
+              <i class="fas fa-redo-alt mr-2"></i>
+              Làm lại
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <section class="text-center py-20 bg-white rounded-xl shadow-sm max-w-2xl mx-auto">
+    <div class="relative mb-8">
+      <div class="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center transform -rotate-6 hover:rotate-0 transition-transform">
+        <i class="fas fa-lightbulb text-4xl text-white"></i>
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur-xl opacity-20"></div>
     </div>
+    <h2 class="text-3xl font-bold mb-4 bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
+      Chưa có bài nộp nào
+    </h2>
+    <p class="mb-8 text-gray-600 max-w-md mx-auto">
+      Hãy bắt đầu hành trình học tập của bạn bằng cách làm bài tập và theo dõi tiến độ tại đây!
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <a href="{% url 'problem_list' %}"
+         class="inline-flex items-center px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 shadow-sm hover:shadow-lg group">
+        <i class="fas fa-rocket mr-2 group-hover:translate-x-1 transition-transform"></i>
+        Bắt đầu làm bài
+      </a>
+      <a href="#" class="text-gray-500 hover:text-gray-700 transition-colors flex items-center">
+        <i class="fas fa-question-circle mr-2"></i>
+        Hướng dẫn sử dụng
+      </a>
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+<!-- Score Update Modal -->
+<div id="score-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md mx-4 transform transition-transform scale-95 duration-200">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold text-gray-800">Sửa điểm</h3>
+      <button onclick="hideScoreModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="text-gray-600 mb-4">
+      Đang sửa điểm cho bài nộp của bài tập: <br>
+      <span id="modal-problem-title" class="font-semibold text-gray-800 text-lg"></span>
+    </div>
+    <form id="score-form" method="POST">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label for="new-score" class="block text-sm font-medium text-gray-700 mb-2">Điểm số mới</label>
+        <input type="number" id="new-score" name="score" step="0.5" min="0" max="10"
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow"
+               placeholder="Nhập điểm mới (0-10)" required>
+      </div>
+      <div class="flex justify-end space-x-3">
+        <button type="button" onclick="hideScoreModal()"
+                class="px-4 py-2 rounded-lg text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">
+          Hủy bỏ
+        </button>
+        <button type="submit"
+                class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors shadow-md">
+          Cập nhật điểm
+        </button>
+      </div>
+    </form>
+    <div id="status-message" class="mt-4 text-center hidden"></div>
+  </div>
 </div>
 
 <script>
-// Enhanced filter functionality with smooth animations
-document.addEventListener('DOMContentLoaded', function() {
-    const subjectFilter = document.getElementById('subject-filter');
-    const dateFilter = document.getElementById('date-filter');
-    const searchFilter = document.getElementById('search-filter');
-    const submissions = document.querySelectorAll('.submission-item');
-    
-    function filterSubmissions() {
-        const selectedSubject = subjectFilter?.value.toLowerCase() || '';
-        const selectedDate = dateFilter?.value || '';
-        const searchTerm = searchFilter?.value.toLowerCase() || '';
-        
-        submissions.forEach((submission, index) => {
-            const subjectText = submission.querySelector('.submission-meta').textContent.toLowerCase();
-            const titleText = submission.querySelector('h3').textContent.toLowerCase();
-            const dateText = submission.querySelector('.submission-meta').textContent;
-            
-            let showSubmission = true;
-            
-            // Filter by subject
-            if (selectedSubject && !subjectText.includes(selectedSubject)) {
-                showSubmission = false;
-            }
-            
-            // Filter by search term
-            if (searchTerm && !titleText.includes(searchTerm)) {
-                showSubmission = false;
-            }
-            
-            // Smooth show/hide animation
-            if (showSubmission) {
-                submission.style.display = 'block';
-                setTimeout(() => {
-                    submission.style.opacity = '1';
-                    submission.style.transform = 'translateY(0)';
-                }, index * 50);
-            } else {
-                submission.style.opacity = '0';
-                submission.style.transform = 'translateY(-20px)';
-                setTimeout(() => {
-                    submission.style.display = 'none';
-                }, 300);
-            }
-        });
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
     }
-    
-    // Add event listeners
-    subjectFilter?.addEventListener('change', filterSubmissions);
-    dateFilter?.addEventListener('change', filterSubmissions);
-    searchFilter?.addEventListener('input', filterSubmissions);
-    
-    // Initialize with animation
-    submissions.forEach((submission, index) => {
-        submission.style.opacity = '0';
-        submission.style.transform = 'translateY(20px)';
+    return cookieValue;
+  }
+
+  function showScoreModal(submissionId, problemTitle) {
+    const modal = document.getElementById('score-modal');
+    const form = document.getElementById('score-form');
+    document.getElementById('modal-problem-title').innerText = problemTitle;
+    form.action = `/submissions/${submissionId}/update_score/`;
+    modal.classList.remove('hidden');
+    document.getElementById('new-score').focus();
+  }
+
+  function hideScoreModal() {
+    const modal = document.getElementById('score-modal');
+    modal.classList.add('hidden');
+    document.getElementById('status-message').innerText = '';
+    document.getElementById('status-message').classList.add('hidden');
+  }
+
+  document.getElementById('score-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const submissionId = form.action.split('/')[4];
+    const statusMessage = document.getElementById('status-message');
+
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+    })
+    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+    .then(({ status, body }) => {
+      statusMessage.classList.remove('hidden');
+      if (status === 200) {
+        statusMessage.className = 'mt-4 text-center text-emerald-600 font-semibold';
+        statusMessage.innerText = body.message;
         setTimeout(() => {
-            submission.style.opacity = '1';
-            submission.style.transform = 'translateY(0)';
-        }, index * 100);
+          window.location.reload();
+        }, 1500);
+      } else {
+        statusMessage.className = 'mt-4 text-center text-red-600 font-semibold';
+        statusMessage.innerText = body.error || 'Đã có lỗi xảy ra.';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      statusMessage.classList.remove('hidden');
+      statusMessage.className = 'mt-4 text-center text-red-600 font-semibold';
+      statusMessage.innerText = 'Kết nối thất bại. Vui lòng thử lại.';
     });
-});
+  });
 </script>
 {% endblock %}

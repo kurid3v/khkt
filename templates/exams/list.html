@@ -1,95 +1,112 @@
 {% extends 'base.html' %}
-{% block title %}Danh sách Đề Thi{% endblock %}
+{% block title %}📚 Danh sách Đề Thi{% endblock %}
 {% block content %}
-<style>
-    body {
-        background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px 0;
-    }
-    .exam-list-container {
-        max-width: 800px;
-        margin: 30px auto;
-        padding: 30px;
-        background: rgba(15, 52, 96, 0.95);
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(26, 26, 46, 0.5);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(233, 69, 96, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-    .exam-card {
-        position: relative;
-        background: rgba(22, 33, 62, 0.9);
-        border-left: 6px solid #E94560;
-        padding: 20px 25px;
-        margin-bottom: 20px;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(26, 26, 46, 0.3);
-        transition: all 0.3s ease;
-    }
-    .exam-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(233, 69, 96, 0.2);
-        border-left-color: #0F3460;
-    }
-    .exam-title {
-        font-size: 20px;
-        font-weight: bold;
-        color: white;
-        text-decoration: none;
-    }
-    .exam-title:hover {
-        color: #E94560;
-    }
-    .exam-info {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 15px;
-        margin-top: 10px;
-    }
-    h2 {
-        text-align: center;
-        color: #ffffff;
-        margin-bottom: 35px;
-        font-size: 32px;
-        font-weight: 700;
-    }
-    .add-button {
-        display: inline-block;
-        margin-bottom: 25px;
-        padding: 15px 25px;
-        background: linear-gradient(135deg, #E94560, #16213E);
-        color: white;
-        font-size: 16px;
-        font-weight: 600;
-        border-radius: 25px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 8px 20px rgba(233, 69, 96, 0.3);
-    }
-    .add-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(233, 69, 96, 0.4);
-    }
-</style>
-<div class="exam-list-container">
-    <a href="{% url 'add_exam' %}" class="add-button">➕ Thêm đề thi</a>
-    <h2>📚 Danh sách đề thi</h2>
-    {% for exam in exams %}
-    <div class="exam-card">
-        <a href="{% url 'exam_detail' exam.id %}" class="exam-title">📘 {{ exam.title }}</a>
-        <div class="exam-info">
-            📝 {{ exam.description|truncatewords:25 }}<br>
-            🕒 <strong>Thời gian:</strong> {{ exam.start_time|date:"H:i d/m/Y" }} - {{ exam.end_time|date:"H:i d/m/Y" }}<br>
-            👤 <strong>Người tạo:</strong> {{ exam.created_by.username }}
+<!-- Main Container -->
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <div class="relative bg-white rounded-xl shadow-md p-6 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Title with Icon -->
+            <div class="flex items-center">
+                <div class="relative">
+                    <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-xl transform -rotate-6 hover:rotate-0 transition-transform">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg blur opacity-30"></div>
+                </div>
+                <div class="ml-4">
+                    <h1 class="text-2xl font-bold text-gray-800">Danh sách đề thi</h1>
+                    <p class="text-gray-500 text-sm mt-1">Quản lý và tạo đề thi mới</p>
+                </div>
+            </div>
+
+            <!-- Add Exam Button -->
+            <a href="{% url 'add_exam' %}" 
+               class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 shadow-sm hover:shadow-md group">
+                <i class="fas fa-plus mr-2 group-hover:scale-110 transition-transform"></i>
+                <span>Thêm đề thi</span>
+            </a>
         </div>
     </div>
-    {% empty %}
-    <div class="exam-card">
-        <p style="color: white; text-align: center;">Chưa có đề thi nào.</p>
+
+    <!-- Exam Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for exam in exams %}
+        <!-- Exam Card -->
+        <div class="group">
+            <div class="relative bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                <!-- Card Header with Gradient Border -->
+                <div class="border-t-4 border-indigo-500"></div>
+                
+                <div class="p-6">
+                    <!-- Title and Score -->
+                    <div class="flex justify-between items-start mb-3">
+                        <a href="{% url 'exam_detail' exam.id %}" class="block group">
+                            <h3 class="text-xl font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors flex items-start">
+                                <span class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center mr-3 group-hover:bg-indigo-100 transition-colors">
+                                    <i class="fas fa-file-alt text-indigo-500"></i>
+                                </span>
+                                {{ exam.title }}
+                            </h3>
+                        </a>
+                        <div class="px-4 py-2 rounded-lg {% if exam.total_score >= 8 %}bg-emerald-50 text-emerald-700{% elif exam.total_score >= 5 %}bg-amber-50 text-amber-700{% else %}bg-red-50 text-red-700{% endif %} flex items-center space-x-2">
+                            <div>
+                                <div class="text-xs font-medium uppercase">Điểm số</div>
+                                <div class="text-lg font-bold">{{ exam.total_score }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="space-y-4 text-gray-600">
+                        <!-- Description -->
+                        <div class="flex items-start">
+                            <span class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center mr-3">
+                                <i class="fas fa-align-left text-purple-500"></i>
+                            </span>
+                            <p class="text-sm flex-1">
+                                {{ exam.description|truncatewords:25 }}
+                            </p>
+                        </div>
+
+                        <!-- Time -->
+                        <div class="flex items-start">
+                            <span class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center mr-3">
+                                <i class="far fa-clock text-indigo-500"></i>
+                            </span>
+                            <div class="text-sm flex-1">
+                                <span class="font-medium block mb-1">Thời gian:</span>
+                                <span class="block text-gray-500">{{ exam.start_time|date:"H:i d/m/Y" }}</span>
+                                <span class="block text-gray-500">{{ exam.end_time|date:"H:i d/m/Y" }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Author -->
+                        <div class="flex items-start">
+                            <span class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-purple-500"></i>
+                            </span>
+                            <div class="text-sm flex-1">
+                                <span class="font-medium">Người tạo:</span>
+                                <span class="ml-1">{{ exam.created_by.username }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- Empty State -->
+        <div class="col-span-full">
+            <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+                <div class="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-inbox text-2xl text-indigo-500"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Chưa có đề thi nào</h3>
+                <p class="text-gray-500">Bắt đầu bằng cách tạo đề thi đầu tiên của bạn.</p>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 {% endblock %}

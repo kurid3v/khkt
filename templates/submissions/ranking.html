@@ -3,86 +3,128 @@
 {% block title %}🏆 Bảng xếp hạng - {{ problem.title }}{% endblock %}
 
 {% block content %}
-<style>
-    .ranking-container {
-        max-width: 720px;
-        margin: 40px auto;
-        padding: 30px;
-        background-color: #fefefe;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        font-family: 'Segoe UI', sans-serif;
-    }
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <header class="relative mb-10 text-center">
+    <div class="relative inline-block">
+      <div class="w-20 h-20 bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center text-white text-3xl transform rotate-12 transition-transform hover:rotate-0 hover:scale-110">
+        <i class="fas fa-trophy"></i>
+      </div>
+      <div class="absolute -inset-2 bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl blur-lg opacity-40"></div>
+    </div>
+    <h1 class="mt-6 text-3xl font-bold text-white tracking-tight">Bảng Xếp Hạng</h1>
+    <p class="mt-2 text-lg text-indigo-200">
+      Những chiến binh xuất sắc nhất cho bài tập: <strong class="font-semibold">{{ problem.title }}</strong>
+    </p>
+  </header>
 
-    .ranking-container h2 {
-        color: #2c3e50;
-        margin-bottom: 25px;
-        border-bottom: 2px solid #e0e0e0;
-        padding-bottom: 10px;
-    }
+  <!-- Bảng xếp hạng hoặc Trạng thái rỗng -->
+  {% if top_scores %}
+    <div class="space-y-3">
+      {% for row in top_scores %}
+        {% comment %} Thêm class đặc biệt cho top 3 {% endcomment %}
+        {% with forloop.counter as rank %}
+        <div
+          class="
+            ranking-item relative flex items-center p-4 rounded-xl shadow-lg
+            transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]
+            {% if rank == 1 %} bg-gradient-to-r from-yellow-300 to-amber-400 border-2 border-yellow-500
+            {% elif rank == 2 %} bg-gradient-to-r from-slate-200 to-gray-300 border-2 border-slate-400
+            {% elif rank == 3 %} bg-gradient-to-r from-orange-300 to-amber-500 border-2 border-orange-500
+            {% else %} bg-white/90 backdrop-blur-sm border border-gray-200 {% endif %}
+            slide-in-item
+          "
+          style="--delay-index: {{ forloop.counter0 }};"
+        >
+          <!-- Huy hiệu Rank -->
+          <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center font-bold text-xl rounded-full mr-4
+            {% if rank == 1 %} bg-yellow-500 text-white shadow-md
+            {% elif rank == 2 %} bg-slate-400 text-white shadow-md
+            {% elif rank == 3 %} bg-orange-500 text-white shadow-md
+            {% else %} bg-indigo-100 text-indigo-600 {% endif %}
+          ">
+            {{ rank }}
+          </div>
 
-    table.ranking-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+          <!-- Thông tin người dùng -->
+          <div class="flex-grow flex items-center">
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center font-semibold text-indigo-700 mr-4 uppercase shadow-inner">
+                {{ row.user__username|first }}
+            </div>
+            <span class="font-semibold text-gray-800">{{ row.user__username }}</span>
+          </div>
 
-    table.ranking-table thead {
-        background-color: #f2f6fc;
-    }
+          <!-- Điểm số -->
+          <div class="flex-shrink-0 ml-4">
+             <div class="px-4 py-2 rounded-lg text-center font-bold
+                {% if row.best_score >= 8 %} bg-emerald-500/80 text-white
+                {% elif row.best_score >= 5 %} bg-amber-500/80 text-white
+                {% else %} bg-red-500/80 text-white {% endif %}
+             ">
+                <span class="text-lg">{{ row.best_score }}</span><span class="text-sm opacity-80">/10</span>
+             </div>
+          </div>
 
-    table.ranking-table th, table.ranking-table td {
-        padding: 12px 16px;
-        text-align: left;
-    }
+          <!-- Vương miện cho top 1 -->
+          {% if rank == 1 %}
+          <div class="absolute -top-4 -left-4 text-3xl text-yellow-500 transform -rotate-12">
+            <i class="fas fa-crown"></i>
+          </div>
+          {% endif %}
+        </div>
+        {% endwith %}
+      {% endfor %}
+    </div>
 
-    table.ranking-table tbody tr:nth-child(even) {
-        background-color: #fafafa;
-    }
+  {% else %}
+    <!-- Trạng thái rỗng -->
+    <div class="text-center py-16 px-6 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg">
+        <div class="relative inline-block mb-8">
+            <div class="w-24 h-24 mx-auto rounded-2xl bg-gradient-to-r from-sky-400 to-cyan-500 flex items-center justify-center transform -rotate-6">
+                <i class="fas fa-satellite-dish text-4xl text-white animate-pulse"></i>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-sky-400 to-cyan-500 rounded-2xl blur-xl opacity-30"></div>
+        </div>
+        <h2 class="text-3xl font-bold text-slate-800">
+            Bảng xếp hạng đang chờ đợi...
+        </h2>
+        <p class="mt-4 mb-8 text-slate-600 max-w-md mx-auto">
+            Hiện chưa có bài nộp nào được ghi nhận. Hãy là người tiên phong và ghi tên mình vào lịch sử!
+        </p>
+        <a href="{% url 'problem_detail' problem.id %}"
+            class="btn btn-primary inline-flex items-center px-8 py-4 text-lg group">
+            <i class="fas fa-rocket mr-3 transition-transform group-hover:rotate-12"></i>
+            Chinh phục thử thách
+        </a>
+    </div>
+  {% endif %}
 
-    table.ranking-table tbody tr:hover {
-        background-color: #eaf2ff;
-    }
+  <!-- Nút quay lại -->
+  <div class="mt-12 text-center">
+      <a href="{% url 'problem_detail' problem.id %}" class="inline-flex items-center px-6 py-3 bg-white/20 text-white rounded-xl hover:bg-white/30 backdrop-blur-sm transition-colors duration-300 font-medium">
+          <i class="fas fa-chevron-left mr-2 text-sm"></i>
+          Quay lại đề bài
+      </a>
+  </div>
 
-    .back-link {
-        display: inline-block;
-        margin-top: 25px;
-        text-decoration: none;
-        color: #3498db;
-        font-weight: 500;
-        transition: color 0.2s;
-    }
-
-    .back-link:hover {
-        color: #216fa2;
-    }
-</style>
-
-<div class="ranking-container">
-    <h2>🏆 Bảng xếp hạng: {{ problem.title }}</h2>
-
-    {% if top_scores %}
-        <table class="ranking-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>👤 Người dùng</th>
-                    <th style="text-align: right;">🎯 Điểm cao nhất</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in top_scores %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ row.user__username }}</td>
-                        <td style="text-align: right;">{{ row.best_score }}/10</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>Chưa có bài nộp nào được chấm điểm cho đề này.</p>
-    {% endif %}
-
-    <a href="{% url 'problem_detail' problem.id %}" class="back-link">← Quay lại đề</a>
 </div>
+
+<style>
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .slide-in-item {
+    animation: slideInUp 0.5s ease-out forwards;
+    animation-delay: calc(var(--delay-index) * 100ms);
+    opacity: 0; /* Bắt đầu ẩn */
+  }
+</style>
 {% endblock %}

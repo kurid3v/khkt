@@ -1,82 +1,63 @@
 {% extends 'base.html' %}
 
-{% block title %}Danh sách bài nộp{% endblock %}
+{% block title %}📄 Danh sách bài nộp{% endblock %}
 
 {% block content %}
-<style>
-    .submission-list {
-        max-width: 900px;
-        margin: 40px auto;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .submission-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .submission-item {
-        background: #fdfdfd;
-        border: 1px solid #e0e0e0;
-        border-left: 5px solid #3498db;
-        border-radius: 8px;
-        padding: 16px 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.04);
-        transition: transform 0.1s ease-in-out;
-    }
-
-    .submission-item:hover {
-        transform: translateY(-2px);
-    }
-
-    .submission-item h3 {
-        margin: 0 0 10px;
-        color: #2c3e50;
-        font-size: 18px;
-    }
-
-    .submission-meta {
-        color: #666;
-        font-size: 14px;
-        margin-bottom: 12px;
-    }
-
-    .view-result-btn {
-        display: inline-block;
-        padding: 8px 16px;
-        background-color: #3498db;
-        color: #fff;
-        border-radius: 4px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 500;
-        transition: background-color 0.2s;
-    }
-
-    .view-result-btn:hover {
-        background-color: #2980b9;
-    }
-</style>
-
-<div class="submission-list">
-    <div class="submission-header">
-        <h1>📄 Danh sách bài đã nộp</h1>
-        <p>Chỉ hiển thị bài bạn đã nộp hoặc đề bạn đã tạo</p>
+<div class="max-w-4xl mx-auto">
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center p-2 bg-white rounded-2xl shadow-sm mb-4">
+            <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-xl">
+                <i class="fas fa-file-upload"></i>
+            </div>
+        </div>
+        <h1 class="text-3xl font-bold text-white mb-2">Danh sách bài đã nộp</h1>
+        <p class="text-gray-200">Chỉ hiển thị bài bạn đã nộp hoặc đề bạn đã tạo</p>
     </div>
 
-    {% for submission in submissions %}
-        <div class="submission-item">
-            <h3>📘 {{ submission.problem.title }}</h3>
-            <div class="submission-meta">
-                👤 <strong>{{ submission.user.username }}</strong> |
-                📚 {{ submission.problem.get_subject_display }} |
-                🕒 {{ submission.submitted_at|date:"H:i d/m/Y" }}
+    <!-- Submissions List -->
+    <div class="space-y-4">
+        {% for submission in submissions %}
+            <div class="bg-white rounded-lg border-2 border-gray-100 hover:border-indigo-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group">
+                <div class="p-6">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-grow">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3 group-hover:text-indigo-600 transition-colors">
+                                <i class="fas fa-book-open text-indigo-500 mr-2"></i>
+                                {{ submission.problem.title }}
+                            </h3>
+                            <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+                                <div class="flex items-center">
+                                    <i class="fas fa-user text-indigo-400 mr-2"></i>
+                                    <span class="font-medium">{{ submission.user.username }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-graduation-cap text-purple-400 mr-2"></i>
+                                    <span>{{ submission.problem.get_subject_display }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock text-blue-400 mr-2"></i>
+                                    <span>{{ submission.submitted_at|date:"H:i d/m/Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'view_result' submission.id %}" 
+                           class="inline-flex items-center px-4 py-2 rounded-md bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium text-sm hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 hover:shadow-lg group-hover:scale-105">
+                            <i class="fas fa-chart-bar mr-2"></i>
+                            Xem kết quả
+                        </a>
+                    </div>
+                </div>
             </div>
-            <a class="view-result-btn" href="{% url 'view_result' submission.id %}">📊 Xem kết quả</a>
-        </div>
-    {% empty %}
-        <p style="text-align: center; color: #888;">🚫 Chưa có bài nộp nào để hiển thị.</p>
-    {% endfor %}
+        {% empty %}
+            <div class="text-center py-12 bg-white rounded-lg border-2 border-dashed border-gray-200">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-inbox text-2xl text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-600 mb-1">Chưa có bài nộp nào</h3>
+                <p class="text-gray-500">Hãy nộp bài để xem kết quả tại đây</p>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

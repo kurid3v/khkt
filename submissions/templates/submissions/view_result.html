@@ -3,75 +3,71 @@
 {% block title %}Kết quả bài nộp{% endblock %}
 
 {% block content %}
-<style>
-    .result-container {
-        max-width: 800px;
-        margin: 30px auto;
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 10px;
-        font-family: 'Arial', sans-serif;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-file-code"></i>
+                Kết quả bài nộp
+            </h2>
+        </div>
+        
+        <div class="card-body">
+            <div class="submission-info">
+                <div class="info-group">
+                    <label class="info-label">
+                        <i class="fas fa-user"></i>
+                        Người nộp:
+                    </label>
+                    <span class="info-value">{{ submission.user.username }}</span>
+                </div>
+                
+                <div class="info-group">
+                    <label class="info-label">
+                        <i class="fas fa-book"></i>
+                        Đề bài:
+                    </label>
+                    <span class="info-value">{{ submission.problem.title }}</span>
+                </div>
+                
+                <div class="info-group">
+                    <label class="info-label">
+                        <i class="fas fa-clock"></i>
+                        Thời gian:
+                    </label>
+                    <span class="info-value">{{ submission.submitted_at|date:"H:i d/m/Y" }}</span>
+                </div>
+                
+                {% if submission.result %}
+                <div class="info-group">
+                    <label class="info-label">
+                        <i class="fas fa-check-circle"></i>
+                        Kết quả:
+                    </label>
+                    <span class="status-badge {% if 'Accepted' in submission.result %}status-accepted{% elif 'Wrong' in submission.result %}status-wrong{% else %}status-pending{% endif %}">
+                        {{ submission.result }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
 
-    .result-container h2 {
-        color: #2c3e50;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #ccc;
-        padding-bottom: 10px;
-    }
+            <div class="code-section">
+                <div class="code-header">
+                    <i class="fas fa-code"></i>
+                    <span>Bài làm</span>
+                </div>
+                <div class="code-wrapper">
+                    <pre><code>{{ submission.code }}</code></pre>
+                </div>
+            </div>
+        </div>
 
-    .info-row {
-        margin-bottom: 12px;
-        font-size: 16px;
-    }
-
-    .info-row strong {
-        color: #34495e;
-        width: 120px;
-        display: inline-block;
-    }
-
-    pre {
-        background-color: #eee;
-        padding: 15px;
-        border-radius: 8px;
-        overflow-x: auto;
-        font-family: monospace;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-    }
-
-    .back-link {
-        display: inline-block;
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #3498db;
-        color: white;
-        border-radius: 5px;
-        text-decoration: none;
-        transition: background-color 0.3s;
-    }
-
-    .back-link:hover {
-        background-color: #2980b9;
-    }
-</style>
-
-<div class="result-container">
-    <h2>📄 Kết quả bài nộp</h2>
-
-    <div class="info-row"><strong>👤 Người nộp:</strong> {{ submission.user.username }}</div>
-    <div class="info-row"><strong>📝 Đề bài:</strong> {{ submission.problem.title }}</div>
-    <div class="info-row"><strong>⏰ Thời gian:</strong> {{ submission.submitted_at|date:"H:i d/m/Y" }}</div>
-
-    <div class="info-row"><strong>📌 Bài làm:</strong></div>
-    <pre>{{ submission.code }}</pre>
-
-    {% if submission.result %}
-        <div class="info-row"><strong>✅ Kết quả chấm:</strong> {{ submission.result }}</div>
-    {% endif %}
-
-    <a href="{% url 'problem_detail' submission.problem.id %}" class="back-link">← Quay lại đề</a>
+        <div class="card-footer">
+            <a href="{% url 'problem_detail' submission.problem.id %}" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i>
+                <span>Quay lại đề bài</span>
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

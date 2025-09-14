@@ -2,13 +2,55 @@
 {% block title %}➕ Thêm đề thi{% endblock %}
 
 {% block content %}
-<div style="max-width: 600px; margin: 30px auto;">
-    <h2>➕ Thêm đề thi</h2>
-
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Lưu đề thi</button>
-    </form>
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden backdrop-blur-lg border-2 border-gray-100">
+        <div class="px-6 py-4 border-b-2 border-gray-100 bg-gray-50">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-md flex items-center justify-center text-white">
+                    <i class="fas fa-file-circle-plus"></i>
+                </div>
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    Thêm đề thi mới
+                </h2>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="space-y-2">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ field.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ field.as_widget|safe }}
+                    </div>
+                    {% if field.help_text %}
+                    <p class="text-sm text-gray-500">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="text-sm text-red-600 mt-1 px-4 py-2 bg-red-50 border border-red-200 rounded-md">
+                        {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                <div class="flex justify-end space-x-3 pt-6 mt-6 border-t-2 border-gray-100">
+                    <a href="{% url 'exam_list' %}" class="px-6 py-2.5 rounded-md border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Quay lại
+                    </a>
+                    <button type="submit" class="px-6 py-2.5 rounded-md bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg transition-all">
+                        <i class="fas fa-save mr-2"></i>
+                        Lưu đề thi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

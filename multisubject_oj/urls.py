@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.homepage, name='home'),  # ✅ Phải có tên 'home'
+    path('', views.homepage, name='home'),
     path('problems/', include('problems.urls')),
     path('submissions/', include('submissions.urls')),
     path('users/', include('users.urls')),

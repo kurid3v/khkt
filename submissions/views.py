@@ -1,33 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.db.models import Q
 from .forms import SubmissionForm
 from .models import Submission
 from problems.models import Problem
 from .api import grade_with_ai
 from django.db.models import Max
+from django.views.decorators.http import require_POST
 import re
 
-@login_required
-# def submit_solution(request, problem_id):
-#     problem = get_object_or_404(Problem, id=problem_id)
-
-#     if request.method == 'POST':
-#         form = SubmissionForm(request.POST)
-#         if form.is_valid():
-#             submission = form.save(commit=False)
-#             submission.user = request.user
-#             submission.problem = problem
-#             submission.save()
-#             return redirect('view_result', submission_id=submission.id)
-#     else:
-#         form = SubmissionForm()
-
-#     return render(request, 'submissions/submit.html', {
-#         'form': form,
-#         'problem': problem
-#     })
 @login_required
 def submit_solution(request, problem_id):
     problem = get_object_or_404(Problem, id=problem_id)
@@ -56,7 +38,6 @@ def submit_solution(request, problem_id):
                 criteria=problem.grading_criteria
             )
 
-
             # Tách điểm từ kết quả
             score_match = re.search(r"Điểm[:\s]+(\d+(?:\.\d+)?)", result_text)
             score = float(score_match.group(1)) if score_match else None
@@ -77,29 +58,6 @@ def submission_list(request):
         'submissions': submissions
     })
 
-
-# def submission_list(request):
-#     user = request.user
-
-#     if user.is_authenticated:
-#         submissions = Submission.objects.filter(
-#             Q(user=user) | Q(problem__author=user)
-#         ).select_related('problem', 'user')
-#     else:
-#         submissions = Submission.objects.none()  # Không hiển thị gì nếu chưa đăng nhập
-
-#     return render(request, 'submissions/list.html', {
-#         'submissions': submissions
-#     })
-
-# def view_result(request, submission_id):
-#     submission = get_object_or_404(Submission, id=submission_id)
-
-#     # ❗ Không cần kiểm tra quyền — mọi người đều xem được
-#     return render(request, 'submissions/result.html', {
-#         'submission': submission
-#     })
-
 def view_result(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
 
@@ -109,8 +67,6 @@ def view_result(request, submission_id):
     return render(request, 'submissions/result.html', {
         'submission': submission
     })
-
-
 
 @login_required
 def submissions_by_problem(request, problem_id):
@@ -142,3 +98,49 @@ def problem_ranking(request, problem_id):
         'problem': problem,
         'top_scores': top_scores
     })
+
+@login_required
+@require_POST
+def update_submission_score(request, submission_id):
+    """
+    Updates the score of a specific submission.
+
+    This function checks if the logged-in user is the creator of the
+    problem associated with the submission before allowing the score to be updated.
+    """
+    try:
+        # Get the submission object based on its ID.
+        # This will return a 404 if the submission does not exist.
+        submission = get_object_or_404(Submission, id=submission_id)
+
+        # Check if the currently logged-in user is the creator of the problem.
+        # This is the core permission check.
+        # It assumes the Problem model has a 'creator' field that is a ForeignKey to a User.
+        if request.user != submission.problem.author:
+            # If the user is not the creator, return a forbidden response.
+            return HttpResponseForbidden("You do not have permission to change this score.")
+
+        # Get the new score from the POST request data.
+        # We'll use get() with a default to avoid a KeyError.
+        new_score_str = request.POST.get('score')
+        
+        if new_score_str is None:
+            return JsonResponse({'error': 'Score not provided.'}, status=400)
+            
+        try:
+            # Convert the score to a float and update the submission object.
+            new_score = float(new_score_str)
+            submission.score = new_score
+            submission.save() # Save the changes to the database.
+
+            # Return a success response.
+            return JsonResponse({'success': True, 'message': 'Score updated successfully.'})
+
+        except (ValueError, TypeError):
+            # Handle cases where the provided score is not a valid number.
+            return JsonResponse({'error': 'Invalid score value provided.'}, status=400)
+
+    except Submission.DoesNotExist:
+        # This case is handled by get_object_or_404, but it's good practice
+        # to have a general catch-all for unexpected issues.
+        return JsonResponse({'error': 'Submission not found.'}, status=404)

@@ -1,333 +1,89 @@
 {% extends 'base.html' %}
-{% block title %}Danh sách bài tập{% endblock %}
+{% block title %}📘 Danh sách bài tập{% endblock %}
+
 {% block content %}
-<style>
-    body {
-        background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px 0;
-    }
-    
-    .problem-list-container {
-        max-width: 800px;
-        margin: 30px auto;
-        padding: 30px;
-        background: rgba(15, 52, 96, 0.95);
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(26, 26, 46, 0.5);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(233, 69, 96, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .problem-list-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, #E94560, #0F3460, #E94560);
-        animation: shimmer 3s ease-in-out infinite;
-    }
-    
-    @keyframes shimmer {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.7; }
-    }
-    
-    .add-button {
-        display: inline-block;
-        margin-bottom: 25px;
-        padding: 15px 25px;
-        background: linear-gradient(135deg, #E94560, #16213E);
-        color: white;
-        font-size: 16px;
-        font-weight: 600;
-        border-radius: 25px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 8px 20px rgba(233, 69, 96, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .add-button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    .add-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(233, 69, 96, 0.4);
-    }
-    
-    .add-button:hover::before {
-        left: 100%;
-    }
-    
-    .search-form {
-        margin-bottom: 25px;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .search-form input[type="text"] {
-        padding: 12px 18px;
-        flex: 1;
-        min-width: 250px;
-        border: 2px solid rgba(233, 69, 96, 0.3);
-        border-radius: 15px;
-        font-size: 16px;
-        background: rgba(22, 33, 62, 0.9);
-        color: white;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 10px rgba(26, 26, 46, 0.3);
-    }
-    
-    .search-form input[type="text"]::placeholder {
-        color: rgba(255, 255, 255, 0.6);
-    }
-    
-    .search-form input[type="text"]:focus {
-        outline: none;
-        border-color: #E94560;
-        box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
-        transform: translateY(-1px);
-    }
-    
-    .search-form button {
-        padding: 12px 20px;
-        background: linear-gradient(135deg, #E94560, #16213E);
-        color: white;
-        border: none;
-        border-radius: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
-    }
-    
-    .search-form button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
-    }
-    
-    .problem-card {
-        position: relative;
-        background: rgba(22, 33, 62, 0.9);
-        border-left: 6px solid #E94560;
-        padding: 20px 25px;
-        margin-bottom: 20px;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(26, 26, 46, 0.3);
-        transition: all 0.3s ease;
-        backdrop-filter: blur(5px);
-        overflow: hidden;
-    }
-    
-    .problem-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(233, 69, 96, 0.05), rgba(15, 52, 96, 0.05));
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .problem-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(233, 69, 96, 0.2);
-        border-left-color: #0F3460;
-    }
-    
-    .problem-card:hover::before {
-        opacity: 1;
-    }
-    
-    .problem-title {
-        text-decoration: none;
-        color: #ffffff;
-        font-size: 20px;
-        font-weight: 600;
-        position: relative;
-        z-index: 1;
-        transition: color 0.3s ease;
-    }
-    
-    .problem-title:hover {
-        color: #E94560;
-    }
-    
-    .problem-info {
-        opacity: 0;
-        max-height: 0;
-        overflow: hidden;
-        font-size: 15px;
-        color: rgba(255, 255, 255, 0.8);
-        margin-top: 12px;
-        transition: all 0.3s ease;
-        position: relative;
-        z-index: 1;
-        padding: 8px 12px;
-        background: rgba(26, 26, 46, 0.7);
-        border-radius: 8px;
-        border: 1px solid rgba(233, 69, 96, 0.2);
-    }
-    
-    .problem-card:hover .problem-info {
-        opacity: 1;
-        max-height: 100px;
-    }
-    
-    .problem-info strong {
-        color: #E94560;
-        font-weight: 600;
-    }
-    
-    h2 {
-        text-align: center;
-        color: #ffffff;
-        margin-bottom: 35px;
-        font-size: 32px;
-        font-weight: 700;
-        text-shadow: 2px 2px 4px rgba(26, 26, 46, 0.5);
-        position: relative;
-    }
-    
-    h2::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80px;
-        height: 4px;
-        background: linear-gradient(90deg, #E94560, #0F3460);
-        border-radius: 2px;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 40px;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 18px;
-        background: rgba(26, 26, 46, 0.7);
-        border-radius: 15px;
-        border: 2px dashed rgba(233, 69, 96, 0.3);
-    }
-    
-    .empty-state::before {
-        content: '📚';
-        font-size: 48px;
-        display: block;
-        margin-bottom: 15px;
-    }
-    
-    /* Animated background elements */
-    .problem-list-container::after {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(233, 69, 96, 0.03) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-        z-index: -1;
-    }
-    
-    @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    /* Number styling */
-    .problem-card .problem-title::before {
-        content: counter(problem-counter);
-        counter-increment: problem-counter;
-        display: inline-block;
-        width: 30px;
-        height: 30px;
-        line-height: 30px;
-        text-align: center;
-        background: linear-gradient(135deg, #E94560, #0F3460);
-        color: white;
-        border-radius: 50%;
-        font-size: 14px;
-        font-weight: 600;
-        margin-right: 10px;
-        vertical-align: middle;
-    }
-    
-    .problem-list-container {
-        counter-reset: problem-counter;
-    }
-    
-    /* Responsive design */
-    @media (max-width: 768px) {
-        .problem-list-container {
-            margin: 20px;
-            padding: 20px;
-        }
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <header class="relative mb-12">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between bg-white rounded-xl shadow-md p-6 mb-8">
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <div class="w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-xl transform -rotate-6 hover:rotate-0 transition-transform">
+            <i class="fas fa-book"></i>
+          </div>
+          <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg blur opacity-30"></div>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">Danh sách bài tập</h1>
+          <p class="text-gray-500 text-sm mt-1">Khám phá và thực hành các bài tập</p>
+        </div>
+      </div>
+
+      <div class="mt-6 lg:mt-0 flex flex-col sm:flex-row gap-4">
+        <div class="relative">
+          <input type="text" name="q" placeholder="Tìm kiếm bài tập..." 
+                 value="{{ request.GET.q|default_if_none:'' }}"
+                 class="w-full sm:w-80 px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                 aria-label="Tìm kiếm bài tập">
+          <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
         
-        .search-form {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .search-form input[type="text"] {
-            min-width: auto;
-        }
-        
-        .problem-card {
-            padding: 15px 20px;
-        }
-        
-        .problem-title {
-            font-size: 18px;
-        }
-        
-        h2 {
-            font-size: 26px;
-        }
-    }
-</style>
-<div class="problem-list-container">
-    <a href="{% url 'add_problem' %}" class="add-button">➕ Thêm bài tập</a>
-    <form method="get" action="" class="search-form">
-        <input type="text" name="q" placeholder="🔍 Tìm bài theo tiêu đề..." value="{{ request.GET.q }}">
-        <button type="submit">Tìm</button>
-    </form>
-    <h2>📘 Danh sách bài tập</h2>
-    {% for problem in problems %}
-        <div class="problem-card">
-            <a href="{% url 'problem_detail' problem.pk %}" class="problem-title">
-                {{ problem.title }}
-            </a>
-            <div class="problem-info">
-                🧠 <strong>Môn:</strong> {{ problem.get_subject_display }}<br>
-                📝 <strong>Loại:</strong> {{ problem.get_question_type_display }}<br>
-                👤 <strong>Tác giả:</strong> {{ problem.author.username }}
+        <a href="{% url 'add_problem' %}" 
+           class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 shadow-sm hover:shadow-md group">
+          <i class="fas fa-plus-circle mr-2 group-hover:scale-110 transition-transform"></i>
+          Thêm bài tập
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Problem List -->
+  <div class="grid grid-cols-1 gap-6">
+    {% if problems %}
+      {% for problem in problems %}
+        <article class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden group">
+          <div class="flex items-start p-6">
+            <div class="flex-shrink-0 mr-6">
+              <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 font-bold text-xl">
+                {{ forloop.counter }}
+              </div>
             </div>
+            
+            <div class="flex-grow">
+              <a href="{% url 'problem_detail' problem.pk %}" 
+                 class="block text-lg font-semibold text-gray-800 hover:text-indigo-600 mb-2 transition-colors"
+                 id="problem-title-{{ problem.pk }}">
+                {{ problem.title }}
+              </a>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                <div class="flex items-center text-gray-600">
+                  <i class="fas fa-brain text-indigo-500 mr-2"></i>
+                  <span>{{ problem.get_subject_display }}</span>
+                </div>
+                <div class="flex items-center text-gray-600">
+                  <i class="fas fa-file-alt text-purple-500 mr-2"></i>
+                  <span>{{ problem.get_question_type_display }}</span>
+                </div>
+                <div class="flex items-center text-gray-600">
+                  <i class="fas fa-user text-indigo-500 mr-2"></i>
+                  <span>{{ problem.author.username }}</span>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </article>
+      {% endfor %}
+    {% else %}
+      <div class="text-center py-12">
+        <div class="w-16 h-16 mx-auto bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+          <i class="fas fa-inbox text-2xl text-indigo-500"></i>
         </div>
-    {% empty %}
-        <div class="empty-state">
-            <p>Hiện chưa có bài tập nào.</p>
-        </div>
-    {% endfor %}
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Không tìm thấy bài tập</h3>
+        <p class="text-gray-500">Không có bài tập nào phù hợp với tìm kiếm của bạn.</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
