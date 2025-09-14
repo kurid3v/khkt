@@ -25,3 +25,4 @@ python manage.py collectstatic --noinput
 
 # chạy server dev
 python manage.py runserver
+python ai_grader.py
