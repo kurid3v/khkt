@@ -69,7 +69,7 @@ martor @ git+https://github.com/CHT-OJ/martor.git@410262a812fe7884c3c1d07c2540b1
 mistune==0.8.4
 mysqlclient==2.2.7
 netaddr==1.3.0
-numpy==2.3.2
+numpy==2.2.6
 oauthlib==3.2.2
 openpyxl==3.1.3
 packaging==21.3

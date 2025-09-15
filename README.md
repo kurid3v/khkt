@@ -18,6 +18,7 @@ cd khkt
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+pip install --no-cache-dir --use-pep517 -r requirements.txt (Ép pip dùng PEP517 build system, bỏ qua setup.py cũ) 
 
 # migrate & collect static
 python manage.py migrate
