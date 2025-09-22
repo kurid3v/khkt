@@ -330,21 +330,21 @@ h4 { font-size: 1.125rem; }
 
 .form-control {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.875rem 1rem;
   border: 1px solid var(--border-color);
   border-radius: 0.375rem;
   font-size: 1rem;
   background-color: var(--bg-color);
   transition: all 0.2s ease;
+  height: 3rem;
 }
 
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-/* Tables */
 .table-container {
   margin: 1.5rem 0;
   overflow-x: auto;

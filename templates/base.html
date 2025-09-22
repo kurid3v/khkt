@@ -1,328 +1,25 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
   <title>{% block title %}My OJ - Hệ thống chấm bài trực tuyến{% endblock %}</title>
-  <meta name="description" content="Hệ thống chấm bài lập trình trực tuyến đa môn học">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="{% static 'style.css' %}">
   
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  
-  <!-- Icons -->
+
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  
-  <!-- Tailwind CSS -->
+
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Custom Styles -->
-  <style>
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #8b5cf6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --info: #06b6d4;
-      --dark: #0f172a;
-      --light: #f8fafc;
-      --border: #e2e8f0;
-      --text-primary: #1e293b;
-      --text-secondary: #64748b;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-
-    * {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    .code-font {
-      font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    }
-
-    body {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-    }
-
-    .glass-effect {
-      backdrop-filter: blur(20px);
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(226, 232, 240, 0.3);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .navbar.scrolled {
-      background: rgba(255, 255, 255, 0.98);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .nav-link {
-      position: relative;
-      transition: all 0.3s ease;
-      border-radius: 12px;
-    }
-
-    .nav-link::before {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 50%;
-      width: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      transition: all 0.3s ease;
-      transform: translateX(-50%);
-      border-radius: 2px;
-    }
-
-    .nav-link:hover::before,
-    .nav-link.active::before {
-      width: 80%;
-    }
-
-    .nav-link:hover {
-      background: rgba(99, 102, 241, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .nav-link.active {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1));
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .btn {
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 12px;
-      font-weight: 500;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: all 0.6s ease;
-    }
-
-    .btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-    }
-
-    .btn-secondary {
-      background: linear-gradient(135deg, var(--secondary), #7c3aed);
-      color: white;
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, var(--success), #059669);
-      color: white;
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, var(--danger), #dc2626);
-      color: white;
-    }
-
-    .btn-light {
-      background: white;
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-    }
-
-    .logo {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-weight: 700;
-      font-size: 1.5rem;
-    }
-
-    .user-menu {
-      position: relative;
-    }
-
-    .user-dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      min-width: 200px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border);
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.3s ease;
-      z-index: 100;
-    }
-
-    .user-menu:hover .user-dropdown {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .content {
-      margin-top: 80px;
-      padding: 2rem;
-      min-height: calc(100vh - 80px);
-    }
-
-    .mobile-menu {
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-    }
-
-    .mobile-menu.open {
-      transform: translateX(0);
-    }
-
-    .notification-badge {
-      position: relative;
-    }
-
-    .notification-badge::after {
-      content: '';
-      position: absolute;
-      top: -2px;
-      right: -2px;
-      width: 8px;
-      height: 8px;
-      background: var(--danger);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.7; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .slide-in {
-      animation: slideIn 0.6s ease forwards;
-    }
-
-    /* Loading animation */
-    .loading-spinner {
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Mobile responsive */
-    @media (max-width: 768px) {
-      .navbar {
-        padding: 0.5rem 1rem;
-      }
-      
-      .content {
-        margin-top: 70px;
-        padding: 1rem;
-      }
-      
-      .nav-desktop {
-        display: none;
-      }
-      
-      .mobile-toggle {
-        display: block;
-      }
-    }
-
-    @media (min-width: 769px) {
-      .nav-desktop {
-        display: flex;
-      }
-      
-      .mobile-toggle,
-      .mobile-menu {
-        display: none;
-      }
-    }
-
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
-      .navbar {
-        background: rgba(15, 23, 42, 0.95);
-        border-bottom-color: rgba(51, 65, 85, 0.3);
-      }
-      
-      .btn-light {
-        background: rgba(51, 65, 85, 0.8);
-        color: white;
-        border-color: rgba(71, 85, 105, 0.5);
-      }
-      
-      .user-dropdown {
-        background: #1e293b;
-        border-color: #334155;
-      }
-    }
-  </style>
 </head>
 
 <body>
-  <!-- Navigation Bar -->
   <nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="flex items-center justify-between w-full max-w-7xl mx-auto px-4">
       
-      <!-- Brand Section -->
       <div class="flex items-center space-x-4">
         <a href="{% url 'home' %}" class="flex items-center space-x-3 group" aria-label="Về trang chủ">
           <div class="relative">
@@ -338,7 +35,6 @@
         </a>
       </div>
 
-      <!-- Desktop Navigation -->
       <div class="nav-desktop hidden md:flex items-center space-x-1">
         <a href="{% url 'home' %}" class="nav-link flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-indigo-600 {% if request.path == '/' %}active{% endif %}">
           <i class="fas fa-home text-sm"></i>
@@ -358,17 +54,14 @@
         </a>
       </div>
 
-      <!-- User Section -->
       <div class="flex items-center space-x-3">
         {% if user.is_authenticated %}
-          <!-- Notifications -->
           <button class="notification-badge p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors" title="Thông báo">
             <i class="fas fa-bell text-gray-600"></i>
           </button>
 
-          <!-- User Menu -->
-          <div class="user-menu">
-            <div class="flex items-center space-x-3 px-3 py-2 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl cursor-pointer hover:from-indigo-100 hover:to-purple-100 transition-all duration-300">
+          <div class="user-menu relative" role="menu">
+            <div id="userMenuTrigger" class="flex items-center space-x-3 px-3 py-2 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl cursor-pointer hover:from-indigo-100 hover:to-purple-100 transition-all duration-300" aria-expanded="false" aria-haspopup="true">
               <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
                 {{ user.username|first|upper }}
               </div>
@@ -376,30 +69,35 @@
                 <div class="font-semibold text-gray-800 text-sm">{{ user.username }}</div>
                 <div class="text-xs text-gray-500">Online</div>
               </div>
-              <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+              <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-300" id="chevronIcon"></i>
             </div>
             
-            <!-- Dropdown Menu -->
-            <div class="user-dropdown">
+            <div class="user-dropdown absolute top-full right-0 mt-2 min-w-[220px] bg-white border border-gray-200 rounded-2xl shadow-lg opacity-0 invisible transform scale-95 pointer-events-none transition-all duration-300 ease-in-out z-[1000]" role="menu">
               <div class="p-4 border-b border-gray-100">
                 <div class="font-semibold text-gray-800">{{ user.get_full_name|default:user.username }}</div>
                 <div class="text-sm text-gray-500">{{ user.email }}</div>
               </div>
               <div class="p-2">
-                <a href="{% url 'profile' %}" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                {% if user.is_staff or user.is_superuser %}
+                  <a href="{% url 'admin:index' %}" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors user-menu-item" role="menuitem">
+                      <i class="fas fa-user-shield text-sm"></i>
+                      <span>Admin</span>
+                  </a>
+                {% endif %}
+                <a href="{% url 'profile' %}" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors user-menu-item" role="menuitem">
                   <i class="fas fa-user-cog text-indigo-500"></i>
                   <span>Hồ sơ cá nhân</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors user-menu-item" role="menuitem">
                   <i class="fas fa-chart-line text-green-500"></i>
                   <span>Thống kê</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors user-menu-item" role="menuitem">
                   <i class="fas fa-cog text-gray-500"></i>
                   <span>Cài đặt</span>
                 </a>
                 <div class="border-t border-gray-100 my-2"></div>
-                <a href="{% url 'logout' %}" class="flex items-center space-x-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                <a href="{% url 'logout' %}" class="flex items-center space-x-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors user-menu-item" role="menuitem">
                   <i class="fas fa-sign-out-alt"></i>
                   <span>Đăng xuất</span>
                 </a>
@@ -407,7 +105,6 @@
             </div>
           </div>
         {% else %}
-          <!-- Authentication Buttons -->
           <div class="flex items-center space-x-2">
             <a href="{% url 'login' %}" class="btn btn-light flex items-center space-x-2 px-4 py-2 text-sm">
               <i class="fas fa-sign-in-alt"></i>
@@ -420,14 +117,12 @@
           </div>
         {% endif %}
 
-        <!-- Mobile Menu Toggle -->
         <button class="mobile-toggle md:hidden p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors" id="mobileMenuToggle">
           <i class="fas fa-bars text-gray-600"></i>
         </button>
       </div>
     </div>
 
-    <!-- Mobile Menu -->
     <div class="mobile-menu md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl" id="mobileMenu">
       <div class="flex items-center justify-between p-4 border-b">
         <div class="flex items-center space-x-3">
@@ -462,10 +157,8 @@
     </div>
   </nav>
 
-  <!-- Mobile Menu Overlay -->
   <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="mobileMenuOverlay"></div>
 
-  <!-- Main Content -->
   <main class="content slide-in" role="main">
     {% block content %}
     <div class="max-w-7xl mx-auto">
@@ -491,10 +184,9 @@
     {% endblock %}
   </main>
 
-  <!-- JavaScript -->
   <script>
-    // Mobile menu functionality
     document.addEventListener('DOMContentLoaded', function() {
+      // Mobile menu functionality
       const mobileMenuToggle = document.getElementById('mobileMenuToggle');
       const mobileMenu = document.getElementById('mobileMenu');
       const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
@@ -552,13 +244,11 @@
             return;
           }
           
-          // Add loading state for form submissions
           if (this.type === 'submit' || this.closest('form')) {
             const originalHTML = this.innerHTML;
             this.innerHTML = '<div class="loading-spinner"></div>';
             this.dataset.loading = 'true';
             
-            // Reset after 3 seconds if still loading
             setTimeout(() => {
               if (this.dataset.loading === 'true') {
                 this.innerHTML = originalHTML;
@@ -581,6 +271,42 @@
             });
           }
         });
+      });
+
+      // User dropdown functionality
+      const userMenuTrigger = document.getElementById('userMenuTrigger');
+      const userDropdown = document.querySelector('.user-dropdown');
+      const chevronIcon = document.getElementById('chevronIcon');
+      let userMenuOpen = false;
+
+      function toggleUserMenu() {
+        userMenuOpen = !userMenuOpen;
+        if (userMenuOpen) {
+          userDropdown.classList.add('visible');
+          userDropdown.classList.remove('invisible', 'opacity-0', 'scale-95', 'pointer-events-none');
+          userMenuTrigger.setAttribute('aria-expanded', 'true');
+          chevronIcon.style.transform = 'rotate(180deg)';
+        } else {
+          userDropdown.classList.remove('visible');
+          userDropdown.classList.add('invisible', 'opacity-0', 'scale-95', 'pointer-events-none');
+          userMenuTrigger.setAttribute('aria-expanded', 'false');
+          chevronIcon.style.transform = 'rotate(0deg)';
+        }
+      }
+
+      // Bật/tắt dropdown khi click vào nút trigger
+      if (userMenuTrigger) {
+        userMenuTrigger.addEventListener('click', function(e) {
+          e.stopPropagation();
+          toggleUserMenu();
+        });
+      }
+
+      // Đóng dropdown khi click ra ngoài
+      document.addEventListener('click', function(e) {
+        if (userMenuOpen && !userDropdown.contains(e.target) && !userMenuTrigger.contains(e.target)) {
+          toggleUserMenu();
+        }
       });
     });
 
