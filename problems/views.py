@@ -14,16 +14,27 @@ def problem_list(request):
     query = request.GET.get('q', '')
     problems = Problem.objects.filter(is_hidden=False)
 
-    if request.user.is_authenticated and request.user.is_staff:
-        # Admin có thể xem tất cả các bài tập
-        problems = Problem.objects.all()
+    if request.user.is_authenticated:
+        # Nếu người dùng đã đăng nhập, kiểm tra quyền admin và lấy danh sách bài đã nộp
+        if request.user.is_staff:
+            # Admin có thể xem tất cả các bài tập
+            problems = Problem.objects.all()
+        
+        # Lấy danh sách ID của các bài tập mà người dùng đã nộp
+        submitted_problem_ids = Submission.objects.filter(user=request.user).values_list('problem_id', flat=True)
+    else:
+        # Nếu chưa đăng nhập, không có bài nào đã nộp
+        submitted_problem_ids = []
 
     if query:
         problems = problems.filter(Q(title__icontains=query))
 
     problems = problems.order_by('?')
 
-    return render(request, 'problems/problem_list.html', {'problems': problems})
+    return render(request, 'problems/problem_list.html', {
+        'problems': problems,
+        'submitted_problem_ids': submitted_problem_ids  # Thêm biến này vào context
+    })
 
 def problem_detail(request, pk):
     """

@@ -9,8 +9,11 @@
         <div class="card shadow mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
-                    <a href="{% url 'exam_detail' exam.id %}" class="text-decoration-none text-primary">
+                    <a href="{% url 'enroll_in_exam' exam.id %}" class="text-decoration-none text-primary">
                         📘 {{ exam.title }}
+                        {% if exam.has_password %}
+                            <span class="text-warning ml-2">🔒</span>
+                        {% endif %}
                     </a>
                 </h5>
                 <span class="badge bg-secondary">

@@ -9,16 +9,25 @@ class Exam(models.Model):
     end_time = models.DateTimeField()
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    # Thêm trường mật khẩu để bảo vệ kỳ thi
+    password = models.CharField(max_length=128, blank=True, null=True, help_text="Để trống nếu không muốn đặt mật khẩu.")
 
     problems = models.ManyToManyField(
         "problems.Problem",
         through="exams.ExamProblem",
         related_name="exams"
     )
+    
+    # Thêm related_name để có thể truy cập danh sách người tham gia từ một kỳ thi
+    enrolled_users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through="exams.ExamEnrollment",
+        related_name="enrolled_exams"
+    )
 
     def __str__(self):
         return self.title
-
 
 class ExamProblem(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name="exam_problems")
@@ -31,7 +40,6 @@ class ExamProblem(models.Model):
             return f"{self.exam.title} - {self.problem.title}"
         return f"{self.exam.title} - [Chưa có Problem]"
 
-
 class ExamChoice(models.Model):
     problem = models.ForeignKey(ExamProblem, on_delete=models.CASCADE, related_name='choices')
     text = models.CharField(max_length=255)
@@ -39,3 +47,17 @@ class ExamChoice(models.Model):
 
     def __str__(self):
         return self.text
+
+# --- Model mới được thêm vào ---
+class ExamEnrollment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    enrolled_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'exam')
+        verbose_name = "Exam Enrollment"
+        verbose_name_plural = "Exam Enrollments"
+
+    def __str__(self):
+        return f"{self.user.username} enrolled in {self.exam.title}"

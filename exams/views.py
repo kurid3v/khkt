@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseForbidden
-from .models import Exam, ExamProblem, ExamChoice
+from django.contrib.auth.hashers import check_password, make_password
+from .models import Exam, ExamProblem, ExamChoice, ExamEnrollment
 from .forms import ExamForm
 from problems.forms import ProblemForm
 from problems.models import Problem
@@ -26,6 +27,7 @@ def exam_list(request):
                 score = difficulty_map.get(prob.problem.difficulty.lower(), 0)
                 total_score += score
         exam.total_score = total_score
+        exam.has_password = bool(exam.password)
         
     return render(request, 'exams/list.html', {'exams': exams})
 
@@ -42,11 +44,49 @@ def add_exam(request):
         form = ExamForm()
     return render(request, 'exams/add_exam.html', {'form': form})
 
+# @login_required
+# def enroll_in_exam(request, exam_id):
+#     exam = get_object_or_404(Exam, id=exam_id)
+
+#     if request.user == exam.created_by or request.user.is_staff:
+#         # Xóa các bản ghi ghi danh khác để đảm bảo duy nhất
+#         ExamEnrollment.objects.filter(user=request.user).exclude(exam=exam).delete()
+#         ExamEnrollment.objects.get_or_create(exam=exam, user=request.user)
+#         return redirect('exam_detail', exam_id=exam.id)
+    
+#     if exam.password:
+#         if request.method == 'POST':
+#             password_input = request.POST.get('password', '')
+#             if check_password(password_input, exam.password):
+#                 # Nếu mật khẩu đúng, xóa các ghi danh cũ và ghi danh mới
+#                 ExamEnrollment.objects.filter(user=request.user).exclude(exam=exam).delete()
+#                 ExamEnrollment.objects.get_or_create(exam=exam, user=request.user)
+#                 return redirect('exam_detail', exam_id=exam.id)
+#             else:
+#                 error_message = "Mật khẩu không đúng. Vui lòng thử lại."
+#                 return render(request, 'exams/exam_not_enrolled.html', {
+#                     'exam': exam,
+#                     'error_message': error_message,
+#                 })
+#         else:
+#             return render(request, 'exams/exam_not_enrolled.html', {'exam': exam})
+    
+#     ExamEnrollment.objects.filter(user=request.user).exclude(exam=exam).delete()
+#     ExamEnrollment.objects.get_or_create(exam=exam, user=request.user)
+#     return redirect('exam_detail', exam_id=exam.id)
+
+@login_required
 def exam_detail(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id)
-    letters = ['A', 'B', 'C', 'D']
 
-    # Lấy đáp án đúng và tính tổng điểm
+    # Thêm dòng này để kiểm tra trạng thái ghi danh
+    is_enrolled = ExamEnrollment.objects.filter(exam=exam, user=request.user).exists()
+    
+    if not is_enrolled:
+        return redirect('enroll_in_exam', exam_id=exam.id)
+
+    # Logic hiển thị chi tiết đề thi
+    letters = ['A', 'B', 'C', 'D']
     answers = []
     total_score = 0
     difficulty_map = {
@@ -56,12 +96,10 @@ def exam_detail(request, exam_id):
 
     exam_problems = exam.exam_problems.order_by('order')
     for prob in exam_problems:
-        # Tính tổng điểm
         if prob.problem and prob.problem.difficulty:
             score = difficulty_map.get(prob.problem.difficulty.lower(), 0)
             total_score += score
 
-        # Lấy đáp án đúng để vẽ phiếu tô đáp án
         if prob.problem.question_type == 'MCQ':
             correct_answer = prob.problem.correct_answer
             if correct_answer:
@@ -70,7 +108,32 @@ def exam_detail(request, exam_id):
                 except ValueError:
                     continue
 
-    # Vẽ ảnh tô đáp án
+    input_path = "/home/tuansangg/multisubject_oj/form.jpg"
+    output_path = f"/home/tuansangg/multisubject_oj/media/output_exam_{exam_id}.jpg"
+    draw_circles_on_form(answers, input_path, output_path)
+
+    return render(request, 'exams/detail.html', {
+        'exam': exam,
+        'letters': letters,
+        'answer_image': f"/media/output_exam_{exam_id}.jpg",
+        'total_score': total_score,
+        'is_enrolled': is_enrolled, # Truyền biến này vào template
+    })
+
+    exam_problems = exam.exam_problems.order_by('order')
+    for prob in exam_problems:
+        if prob.problem and prob.problem.difficulty:
+            score = difficulty_map.get(prob.problem.difficulty.lower(), 0)
+            total_score += score
+
+        if prob.problem.question_type == 'MCQ':
+            correct_answer = prob.problem.correct_answer
+            if correct_answer:
+                try:
+                    answers.append(f"{prob.order}{correct_answer.strip().upper()}")
+                except ValueError:
+                    continue
+
     input_path = "/home/tuansangg/multisubject_oj/form.jpg"
     output_path = f"/home/tuansangg/multisubject_oj/media/output_exam_{exam_id}.jpg"
     draw_circles_on_form(answers, input_path, output_path)
@@ -90,7 +153,7 @@ def add_exam_problem(request, exam_id):
         if form.is_valid():
             problem = form.save(commit=False)
             problem.author = request.user
-            problem.is_hidden = True  # Tự động ẩn bài tập khi được thêm vào đề thi
+            problem.is_hidden = True
             problem.save()
             ExamProblem.objects.create(
                 exam=exam,
@@ -135,3 +198,69 @@ def draw_answer_sheet(exam_id, answers):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     image.save(output_path)
     return f"/media/output_exam_{exam_id}.jpg"
+
+# @login_required
+# def leave_exam(request, exam_id):
+#     exam = get_object_or_404(Exam, id=exam_id)
+    
+#     # Tìm và xóa bản ghi ExamEnrollment của người dùng
+#     enrollment = ExamEnrollment.objects.filter(exam=exam, user=request.user)
+    
+#     # Chỉ cho phép rời kỳ thi nếu người dùng không phải là người tạo
+#     if request.user != exam.created_by:
+#         enrollment.delete()
+    
+#     return redirect('exam_list')
+
+@login_required
+def enroll_in_exam(request, exam_id):
+    exam = get_object_or_404(Exam, id=exam_id)
+
+    # 1. Bỏ qua bước kiểm tra mật khẩu cho admin và người tạo đề
+    if request.user == exam.created_by or request.user.is_staff:
+        ExamEnrollment.objects.get_or_create(exam=exam, user=request.user)
+        # Tạo biến session xác thực để không hỏi lại mật khẩu
+        request.session[f'exam_{exam_id}_authenticated'] = True
+        return redirect('exam_detail', exam_id=exam.id)
+    
+    # 2. Kiểm tra nếu đã có xác thực trong session, thì bỏ qua mật khẩu
+    if request.session.get(f'exam_{exam_id}_authenticated'):
+        ExamEnrollment.objects.get_or_create(exam=exam, user=request.user)
+        return redirect('exam_detail', exam_id=exam.id)
+
+    # 3. Xử lý logic mật khẩu cho người dùng thông thường
+    if exam.password:
+        if request.method == 'POST':
+            password_input = request.POST.get('password', '')
+            if check_password(password_input, exam.password):
+                # Lưu trạng thái xác thực vào session
+                request.session[f'exam_{exam_id}_authenticated'] = True
+                ExamEnrollment.objects.get_or_create(exam=exam, user=request.user)
+                return redirect('exam_detail', exam_id=exam.id)
+            else:
+                error_message = "Mật khẩu không đúng. Vui lòng thử lại."
+                return render(request, 'exams/exam_not_enrolled.html', {
+                    'exam': exam,
+                    'error_message': error_message,
+                })
+        else:
+            return render(request, 'exams/exam_not_enrolled.html', {'exam': exam})
+    
+    # 4. Nếu không có mật khẩu, ghi danh trực tiếp
+    ExamEnrollment.objects.get_or_create(exam=exam, user=request.user)
+    return redirect('exam_detail', exam_id=exam.id)
+
+@login_required
+def leave_exam(request, exam_id):
+    exam = get_object_or_404(Exam, id=exam_id)
+    
+    enrollment = ExamEnrollment.objects.filter(exam=exam, user=request.user)
+    
+    # Chỉ cho phép rời kỳ thi nếu người dùng không phải là người tạo
+    if request.user != exam.created_by:
+        enrollment.delete()
+        # Xóa trạng thái xác thực mật khẩu khỏi session
+        if f'exam_{exam_id}_authenticated' in request.session:
+            del request.session[f'exam_{exam_id}_authenticated']
+
+    return redirect('exam_list')
